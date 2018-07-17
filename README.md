@@ -4,7 +4,7 @@
 
 This is code for training and evaluating a Convolutional Neural Network for board evaluation in Go. This is an ongoing project and I will be adding to it in the coming weeks. The basic idea is motivated from two recent papers which did move prediction by training a network from professional game records ([Clark et. al](http://arxiv.org/abs/1412.3409) and [Maddison et. al](http://arxiv.org/pdf/1412.6564v2.pdf)). In this project instead of predicting the next move given the current board, we instead predict the final state of the board. This is possible due to the nature of the game Go, because pieces do not move during the game, early and midgame board positions are highly predictive of the final ownership. One hope is that a well trained position evaluator can be used in a strong Go playing engine, in particular remove the need for Monte Carlo Tree Search (MTCS) and instead allow for a traditional alpha-beta pruning approach like in the best Chess programs. The model exhibited here would likely perform poorly for such a task (for a number of reasons), but it is still interesting to see what it learned and I hope this work will inspire future projects.
 
-##Current Model
+## Current Model
 
 The inputs to the model are 8 feature planes containing information about the current state of the board. The target is a 19x19 binary matrix, where 1 indicates the player to move owns the location as either territory or has a stone on the location at the end of the game, 0 indicates the other player. In seki situations we consider both groups alive, and randomly assign spaces in between stones. Because we need to know the final state of the board, we only train on professional games which were played until the end, games ending in resignation are ignored. We train on ~15000 games from the Go4Go data set. We used GNU-Go to remove dead stones from the board and determine final ownership. Training on only games not ending in resignation has likely introduced unwanted biases to the model (e.g. large groups are more likely to live and all games are close), future work should address this issue.
 
@@ -41,12 +41,12 @@ It is unclear though whether or not previous move locations is a good idea if th
 
 **Chain Pooling**
 One interesting tweak I would like to try is what I call "chain pooling". To motivation chain pooling, consider the game below (black has just played a sacrificial stone at T11):
-![alt-text](http://i.imgur.com/K06c91S.png)
+![alt-text](http://i.imgur.com/K06c91S.png)  
 Note the connected black stones at G16. The model is confident (and correct) that the upper part of the group will live at G18 and G17, yet it is unsure what will happen to G16, H16, and G15. However, even beginner Go players will agree that all stones in a connected group should share the same fate. As another example look at the white stones around S9. It would make sense to encourage the model to make the same predictions about connected stones, it would also make sense for the model to have the same internal representation for connected stones in the intermediate layers. 
 
 To fix these issues I propose internal pooling layers where one takes a max pool along connected groups of stones. This is a little more complicated than traditional max pooling because the **shape of the max pools depends on the input**. I believe the resulting model space should be differentiable, it's more of a question of how to implement this computationally. 
 
-##Usage
+## Usage
 
 **Training**
 Current API for the code isn't great, you need to set data_dir variables and other flags within several .py files. Basic pipeline is the following:
@@ -65,7 +65,7 @@ For visualization see the README under code/visualiation. You can use a saved ch
 * [gogui](http://gogui.sourceforge.net/)
 
 
-##Todo
+## Todo
 
 
 1. Streamline the install and munging phase so it is easier to replicate on new machines. Currently you will have to fight a lot of dependencies from a fresh clone.
