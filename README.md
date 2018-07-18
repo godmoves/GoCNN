@@ -57,7 +57,8 @@ Current API for the code isn't great, you need to set data_dir variables and oth
 
 **Visualization**
 For visualization see the README under code/visualiation. You can use a saved checkpoint of the model which is located in data/working, also a single sgf file which is located in data/sgf_files.
-##Third party libraries/software used
+
+## Third party libraries/software used
 * Modified some code from [kgsgo-dataset-preprocessor](https://github.com/hughperkins/kgsgo-dataset-preprocessor) to do data munging.
 * [gomill](https://github.com/mattheww/gomill)
 * [gnugo](https://www.gnu.org/software/gnugo/)
