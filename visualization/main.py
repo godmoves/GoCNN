@@ -15,13 +15,13 @@ import re
 import random
 import numpy as np
 import os
-from .GoDriver import GoDriver
+from GoDriver import GoDriver
 
-MODEL_PATH = "../../data/working/board_eval_cnn_5layer.ckpt"
+MODEL_PATH = "../data/working/board_eval_cnn_5layer.ckpt"
 
 #everytime we reset the board we will load a random game from this directory to view
 #SGF_DIRECTORY = "/home/justin/Programming/GoAI/Completing_Go_Games/pro_games" 
-SGF_DIRECTORY = "../../data/sgf_files" 
+SGF_DIRECTORY = "../data/sgf_files" 
 
 N = 19 #size of the board
 letter_coords = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T']
@@ -29,6 +29,7 @@ letter_coords = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'L', 'M', 'N'
 #sgf_dir - string, directory containing sgf files
 #returns list of strings
 def get_sgf_filelist(sgf_dir):
+    print("Looking for games in %s" % sgf_dir, file=sys.stderr)
     sgf_files = []
     for subdir, dirs, files in os.walk(SGF_DIRECTORY):
         for file in files:
@@ -45,6 +46,7 @@ def coord_to_str(row, col):
 #ownership_matrix - [N,N] matrix of floats output from the CNN model
 #Formats a valid response string that can be fed into gogui as response to the 'predict_ownership' command
 def influence_str(ownership_matrix):
+    print("Score without komi: %.2f" % np.sum(2 * ownership_matrix - 1), file=sys.stderr)
     rtn_str = "INFLUENCE "
     for i in xrange(len(ownership_matrix)):
         for j in xrange(len(ownership_matrix)):
