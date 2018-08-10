@@ -74,6 +74,6 @@ For visualization see the README under code/visualiation. You can use a saved ch
 3. Try additional features such as previous moves, turns since move was played.
 4. Try different size model architectures.
 5. Compare model with existing score evaluation programs.
-
+6. Add a feature to point out black/white is going to move.
 
 > Written with [StackEdit](https://stackedit.io/).
