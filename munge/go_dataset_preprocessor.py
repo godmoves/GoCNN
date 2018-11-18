@@ -24,21 +24,22 @@
 from __future__ import absolute_import
 from __future__ import division
 
-import argparse
-import json
+# import argparse
+# import json
 import sys
 import os
 
 import gomill
 import gomill.sgf
+import pandas as pd
 
-import finish_games
-import bit_writer
-sys.path.append("../thirdparty")
-import GoBoard
+from munge import finish_games
+from munge import bit_writer
+# sys.path.append("../thirdparty")
+from thirdparty import GoBoard
 
 
-def addToDataFile(datafile, color, move, goBoard, ownership, black_ownership, white_ownership):
+def addToDataFile(datafile, color, move, goBoard, ownership, black_ownership, white_ownership, board_size):
     '''
         datafile is an open binary file we are writing to
         color is the color of the next person to move
@@ -137,9 +138,10 @@ def walkthroughSgf(sgf_contents, sgf_file_path, sgf_file_name, output_file_path,
     # is often off by 1 because of chinese scoring.
     black_ownership, white_ownership = None, None
     if ownership:
+        # set year_lowerbound will ignore all games before given year
         black_ownership, white_ownership = finish_games.finish_sgf_and_get_ownership(
             sgf_file_path, sgf_file_name, completed_dir, board_size,
-            difference_threshold=6, year_lowerbound=0)  # set year_lowerbound will ignore all games before given year
+            difference_threshold=6, year_lowerbound=0)
 
         if black_ownership is None or white_ownership is None:
             print("Unable to get final ownership for %s" % sgf_file_path)
@@ -152,7 +154,8 @@ def walkthroughSgf(sgf_contents, sgf_file_path, sgf_file_name, output_file_path,
         (color, move) = it.get_move()
         if color is not None and move is not None:
             (row, col) = move
-            addToDataFile(output_file, color, move, goBoard, ownership, black_ownership, white_ownership)
+            addToDataFile(output_file, color, move, goBoard, ownership, black_ownership,
+                          white_ownership, board_size)
             try:
                 goBoard.applyMove(color, (row, col))
             except Exception:
@@ -179,13 +182,24 @@ def munge_sgf(sgf_file_path, sgf_file_name, output_file_path, completed_dir, boa
     if contents.find('SZ[%d]' % board_size) < 0:
         print('not %dx%d, skipping: %s' % (board_size, board_size, sgf_file_path))
     try:
-        walkthroughSgf(contents, sgf_file_path, sgf_file_name, output_file_path, completed_dir, board_size, ownership)
+        walkthroughSgf(contents, sgf_file_path, sgf_file_name, output_file_path,
+                       completed_dir, board_size, ownership)
     except Exception:
         print("Weird exception happened caught for file " + os.path.abspath(sgf_file_path))
         os.remove(sgf_file_path)
         print(sys.exc_info()[0])
         # print "Terminating the munging..."
         # raise
+
+
+def munge_csv(file_path, file_name, file_count, output_file_path_base, completed_dir, board_size, ownership):
+    file = pd.read_csv(file_path)
+    for content in file['sgf']:
+        output_file_path = output_file_path_base + str(file_count) + '.dat'
+        walkthroughSgf(content, file_path, file_name, output_file_path, completed_dir, board_size, ownership)
+        file_count += 1
+
+    return file_count
 
 
 def munge_all_sgfs(input_dir, output_dir, completed_dir, board_size, ownership):
@@ -200,7 +214,7 @@ def munge_all_sgfs(input_dir, output_dir, completed_dir, board_size, ownership):
         for file in files:
             filepath = subdir + os.sep + file
             if file_count % 1000 == 0:
-                print(file_count)
+                print('file count: %d' % file_count)
             if filepath.endswith(".sgf"):
                 output_file_path = output_dir + os.sep + file[:-4] + ".dat"
                 if os.path.isfile(output_file_path):
@@ -208,6 +222,13 @@ def munge_all_sgfs(input_dir, output_dir, completed_dir, board_size, ownership):
                     continue
                 munge_sgf(filepath, file, output_file_path, completed_dir, board_size, ownership)
                 file_count += 1
+            elif filepath.endswith(".csv"):
+                output_file_path_base = output_dir + os.sep + file[:-4] + '_'
+                if os.path.isfile(output_file_path_base):
+                    print("File already exists: %s" % output_file_path_base)
+                    continue
+                file_count = munge_csv(filepath, file, file_count, output_file_path_base,
+                                       completed_dir, board_size, ownership)
     print("There were %d files" % (file_count))
     if file_count == 0:
         print("No sgf_files were found in the directory, nothing to do.")
@@ -220,42 +241,42 @@ def munge_all_sgfs(input_dir, output_dir, completed_dir, board_size, ownership):
             os.mkdir(completed_dir)
 
 
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
+# if __name__ == '__main__':
+#     parser = argparse.ArgumentParser()
 
-    # settings for munging
-    parser.add_argument('-i', '--input_dir',
-                        dest='input_dir',
-                        type=str,
-                        default='./data/sgf_files',
-                        help='directory containing sgf files as inputk')
-    parser.add_argument('-o', '--output_dir',
-                        dest='output_dir',
-                        type=str,
-                        default='./data/input_samples_all',
-                        help='output directory to write processed binary files to')
-    parser.add_argument('-c', '--completed_dir',
-                        dest='completed_dir',
-                        default='./data/completed_sgf_files',
-                        help='directory to save gnugo completed sgf files (with ownership info)')
-    parser.add_argument('-b' '--board_size',
-                        dest='board_size',
-                        type=int,
-                        default=9,
-                        help='board size')
-    parser.add_argument('--no_ownership',
-                        dest='ownership',
-                        default=True,
-                        action='store_false')
+#     # settings for munging
+#     parser.add_argument('-i', '--input_dir',
+#                         dest='input_dir',
+#                         type=str,
+#                         default='./data/sgf_files',
+#                         help='directory containing sgf files as inputk')
+#     parser.add_argument('-o', '--output_dir',
+#                         dest='output_dir',
+#                         type=str,
+#                         default='./data/input_samples_all',
+#                         help='output directory to write processed binary files to')
+#     parser.add_argument('-c', '--completed_dir',
+#                         dest='completed_dir',
+#                         default='./data/completed_sgf_files',
+#                         help='directory to save gnugo completed sgf files (with ownership info)')
+#     parser.add_argument('-b' '--board_size',
+#                         dest='board_size',
+#                         type=int,
+#                         default=9,
+#                         help='board size')
+#     parser.add_argument('--no_ownership',
+#                         dest='ownership',
+#                         default=True,
+#                         action='store_false')
 
-    args = parser.parse_args()
-    params = vars(args)
-    print(json.dumps(params, indent=2))
+#     args = parser.parse_args()
+#     params = vars(args)
+#     print(json.dumps(params, indent=2))
 
-    input_dir = params["input_dir"]
-    output_dir = params["output_dir"]
-    completed_dir = params["completed_dir"]
-    board_size = params["board_size"]
-    ownership = params["ownership"]
+#     input_dir = params["input_dir"]
+#     output_dir = params["output_dir"]
+#     completed_dir = params["completed_dir"]
+#     board_size = params["board_size"]
+#     ownership = params["ownership"]
 
-    munge_all_sgfs(input_dir, output_dir, completed_dir, board_size, ownership)
+#     munge_all_sgfs(input_dir, output_dir, completed_dir, board_size, ownership)

@@ -6,14 +6,14 @@ import subprocess
 import threading
 import re
 import os
-import sys
+# import sys
 
 import gomill.sgf
 import gomill
 import numpy as np
 
-sys.path.append("../thirdparty")
-import GoBoard
+# sys.path.append("../thirdparty")
+from thirdparty import GoBoard
 
 
 def finish_sgf(sgf_filepath, dest_file, board_size=19, difference_threshold=6,

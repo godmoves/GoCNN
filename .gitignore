@@ -1,11 +1,10 @@
 *.dat
 *.pyc
-.gitignore~
 .ipynb_checkpoints
 *.log
 *.sgf
 *.sgfc
 
-future/
+data
 checkpoint
 gnugo*
