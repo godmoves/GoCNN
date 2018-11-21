@@ -159,7 +159,7 @@ def get_final_ownership(gnu_sgf_outputfile, board_size=19):
 
 def finish_sgf_and_get_ownership(sgf_file_path, sgf_file_name, completed_dir,
                                  board_size=19, difference_threshold=6, year_lowerbound=0):
-    dest_file = completed_dir + sgf_file_name + "c"
+    dest_file = os.path.join(completed_dir, sgf_file_name) + "c"
 
     # first we check if gnugo has already finished this game, if so we just open
     # the .sfgc file can grab final ownership if we haven't munged already, munge
