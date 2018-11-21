@@ -33,7 +33,7 @@ def get_sgf_filelist(sgf_dir):
     sgf_files = []
     for subdir, dirs, files in os.walk(SGF_DIRECTORY):
         for file in files:
-            filepath = subdir + os.sep + file
+            filepath = os.path.join(subdir, file)
             if filepath.endswith(".sgf"):
                 sgf_files.append(filepath)
     print("Number of sgf files found: %d" % len(sgf_files), file=sys.stderr)

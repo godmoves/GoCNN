@@ -177,7 +177,7 @@ def traverse_directory(source_dir_path, dest_dir_path):
     file_count = 0
     for subdir, dirs, files in os.walk(source_dir_path):
         for file in files:
-            filepath = subdir + os.sep + file
+            filepath = os.path.join(subdir, file)
             if filepath.endswith(".sgf"):
                 print(file_count)
                 try:

@@ -100,9 +100,9 @@ def addToDataFile(datafile, color, move, goBoard, ownership, black_ownership, wh
                     thisbyte = thisbyte | 32
             if goBoard.isSimpleKo(color, pos):
                 thisbyte = thisbyte | 64
-            if color == 'b':  # mark the color to move
-                thisbyte = thisbyte | 128
-            thisbyte = thisbyte | 256
+            # if color == 'b':  # mark the color to move
+            #     thisbyte = thisbyte | 128
+            thisbyte = thisbyte | 128
             datafile.write(chr(thisbyte))
 
 
@@ -209,18 +209,18 @@ def munge_all_sgfs(input_dir, output_dir, completed_dir, board_size, ownership):
     file_count = 0
     for subdir, dirs, files in os.walk(input_dir):
         for file in files:
-            filepath = subdir + os.sep + file
+            filepath = os.path.join(subdir, file)
             if file_count % 1000 == 0:
                 print('file count: %d' % file_count)
             if filepath.endswith(".sgf"):
-                output_file_path = output_dir + os.sep + file[:-4] + ".dat"
+                output_file_path = os.path.join(output_dir, file[:-4]) + ".dat"
                 if os.path.isfile(output_file_path):
                     print("File already exists: %s" % output_file_path)
                     continue
                 munge_sgf(filepath, file, output_file_path, completed_dir, board_size, ownership)
                 file_count += 1
             # elif filepath.endswith(".csv"):
-            #     output_file_path_base = output_dir + os.sep + file[:-4] + '_'
+            #     output_file_path_base = os.path.join(output_dir, file[:-4]) + '_'
             #     if os.path.isfile(output_file_path_base):
             #         print("File already exists: %s" % output_file_path_base)
             #         continue
