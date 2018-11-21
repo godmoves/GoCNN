@@ -6,10 +6,9 @@
 
 import Bag2d
 
+
 # represents a string of contiguous pieces of one color on the board
 # including we have a list of all its liberties, and therefore their count
-
-
 class GoString(object):
     def __init__(self, boardSize, color):
         self.boardSize = boardSize

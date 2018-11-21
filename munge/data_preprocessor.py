@@ -1,5 +1,5 @@
 #!/usr/bin/python
-#
+
 # Copyright Hugh Perkins 2015 hughperkins at gmail
 #
 # This Source Code Form is subject to the terms of the Mozilla Public License,
@@ -24,8 +24,6 @@
 from __future__ import absolute_import
 from __future__ import division
 
-# import argparse
-# import json
 import sys
 import os
 
@@ -35,7 +33,6 @@ import pandas as pd
 
 from munge import finish_games
 from munge import bit_writer
-# sys.path.append("../thirdparty")
 from thirdparty import GoBoard
 
 
@@ -186,8 +183,8 @@ def munge_sgf(sgf_file_path, sgf_file_name, output_file_path, completed_dir, boa
                        completed_dir, board_size, ownership)
     except Exception:
         print("Weird exception happened caught for file " + os.path.abspath(sgf_file_path))
-        os.remove(sgf_file_path)
         print(sys.exc_info()[0])
+        # os.remove(sgf_file_path)
         # print "Terminating the munging..."
         # raise
 
@@ -222,13 +219,13 @@ def munge_all_sgfs(input_dir, output_dir, completed_dir, board_size, ownership):
                     continue
                 munge_sgf(filepath, file, output_file_path, completed_dir, board_size, ownership)
                 file_count += 1
-            elif filepath.endswith(".csv"):
-                output_file_path_base = output_dir + os.sep + file[:-4] + '_'
-                if os.path.isfile(output_file_path_base):
-                    print("File already exists: %s" % output_file_path_base)
-                    continue
-                file_count = munge_csv(filepath, file, file_count, output_file_path_base,
-                                       completed_dir, board_size, ownership)
+            # elif filepath.endswith(".csv"):
+            #     output_file_path_base = output_dir + os.sep + file[:-4] + '_'
+            #     if os.path.isfile(output_file_path_base):
+            #         print("File already exists: %s" % output_file_path_base)
+            #         continue
+            #     file_count = munge_csv(filepath, file, file_count, output_file_path_base,
+            #                            completed_dir, board_size, ownership)
     print("There were %d files" % (file_count))
     if file_count == 0:
         print("No sgf_files were found in the directory, nothing to do.")
@@ -239,44 +236,3 @@ def munge_all_sgfs(input_dir, output_dir, completed_dir, board_size, ownership):
         if not os.path.exists(completed_dir):
             print("%s not found, creating it" % completed_dir)
             os.mkdir(completed_dir)
-
-
-# if __name__ == '__main__':
-#     parser = argparse.ArgumentParser()
-
-#     # settings for munging
-#     parser.add_argument('-i', '--input_dir',
-#                         dest='input_dir',
-#                         type=str,
-#                         default='./data/sgf_files',
-#                         help='directory containing sgf files as inputk')
-#     parser.add_argument('-o', '--output_dir',
-#                         dest='output_dir',
-#                         type=str,
-#                         default='./data/input_samples_all',
-#                         help='output directory to write processed binary files to')
-#     parser.add_argument('-c', '--completed_dir',
-#                         dest='completed_dir',
-#                         default='./data/completed_sgf_files',
-#                         help='directory to save gnugo completed sgf files (with ownership info)')
-#     parser.add_argument('-b' '--board_size',
-#                         dest='board_size',
-#                         type=int,
-#                         default=9,
-#                         help='board size')
-#     parser.add_argument('--no_ownership',
-#                         dest='ownership',
-#                         default=True,
-#                         action='store_false')
-
-#     args = parser.parse_args()
-#     params = vars(args)
-#     print(json.dumps(params, indent=2))
-
-#     input_dir = params["input_dir"]
-#     output_dir = params["output_dir"]
-#     completed_dir = params["completed_dir"]
-#     board_size = params["board_size"]
-#     ownership = params["ownership"]
-
-#     munge_all_sgfs(input_dir, output_dir, completed_dir, board_size, ownership)

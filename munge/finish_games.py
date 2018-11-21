@@ -6,13 +6,11 @@ import subprocess
 import threading
 import re
 import os
-# import sys
 
 import gomill.sgf
 import gomill
 import numpy as np
 
-# sys.path.append("../thirdparty")
 from thirdparty import GoBoard
 
 
@@ -34,7 +32,7 @@ def finish_sgf(sgf_filepath, dest_file, board_size=19, difference_threshold=6,
     # I added this to speed up the process. Many files in the dataset were
     # incomplete games, even though the final score was recorded. gnugo would
     # take a long time to finish these incomplete games.
-    if move_count < 40:
+    if move_count < 50:
         print("%s only had %d moves" % (sgf_filepath, move_count))
         return False
 
@@ -49,19 +47,24 @@ def finish_sgf(sgf_filepath, dest_file, board_size=19, difference_threshold=6,
     m = re.search(match_str, contents)
     if m:
         result_str = m.group(1)
-        pieces = result_str.split("+")
-        try:
-            winner = pieces[0]
-            if pieces[1] == "" or pieces[1][0].lower() == "r" or pieces[1][0].lower() == "t":
-                print("Skipping because result was: %s" % result_str)
+
+        # handle draw for cgos rule
+        if result_str == 'Draw':
+            score = 0
+        else:
+            pieces = result_str.split("+")
+            try:
+                winner = pieces[0]
+                if pieces[1] == "" or pieces[1][0].lower() == "r" or pieces[1][0].lower() == "t":
+                    print("Skipping because result was: %s" % result_str)
+                    return False
+                score = float(pieces[1])
+                if winner == "W":
+                    score *= -1
+            except Exception:
+                print("Error parsing result, result_str = %s, file: %s" %
+                      (result_str, sgf_filepath))
                 return False
-            score = float(pieces[1])
-            if winner == "W":
-                score *= -1
-        except Exception:
-            print("Error parsing result, result_str = %s, file: %s" %
-                  (result_str, sgf_filepath))
-            return False
     else:
         print("Couldn't find result, skipping: %s" % sgf_filepath)
         return False
@@ -75,16 +78,9 @@ def finish_sgf(sgf_filepath, dest_file, board_size=19, difference_threshold=6,
             print("Game is too old: %s" % sgf_filepath)
             return False
 
-    # we call gnugo with the appropriate flags to finish the game. gnugo will write the results to dest_file
-    p = subprocess.Popen(["gnugo", "-l", sgf_filepath, "--outfile", dest_file,
-                          "--score", "aftermath", "--capture-all-dead", "--chinese-rules"], stdout=subprocess.PIPE)
-    timer = threading.Timer(gnugo_timeout, p.kill)
-    try:
-        timer.start()
-        # gnugo will print the final score, we check this with whats written in the sgffile
-        output, err = p.communicate()
-    finally:
-        timer.cancel()
+    gnugo_path = os.getcwd() + "/gnugo"
+    output = run_gungo(gnugo_path, sgf_filepath, dest_file)
+
     m = re.search(r"([A-Za-z]+) wins by ([0-9\.]+) points", output)
     if m is None:
         return False
@@ -98,6 +94,23 @@ def finish_sgf(sgf_filepath, dest_file, board_size=19, difference_threshold=6,
         os.remove(dest_file)
         return False
     return True
+
+
+def run_gungo(gnugo_path, sgf_filepath, dest_file):
+    # we call gnugo with the appropriate flags to finish the game. gnugo will write the results to dest_file
+    p = subprocess.Popen([gnugo_path, "-l", sgf_filepath, "--outfile", dest_file,
+                          "--score", "aftermath", "--capture-all-dead", "--chinese-rules"], stdout=subprocess.PIPE)
+    timer = threading.Timer(10, p.kill)
+    try:
+        timer.start()
+        # gnugo will print the final score, we check this with whats written in the sgffile
+        output, err = p.communicate()
+    finally:
+        timer.cancel()
+
+    print(output)
+
+    return output
 
 
 def get_final_ownership(gnu_sgf_outputfile, board_size=19):
@@ -146,7 +159,7 @@ def get_final_ownership(gnu_sgf_outputfile, board_size=19):
 
 def finish_sgf_and_get_ownership(sgf_file_path, sgf_file_name, completed_dir,
                                  board_size=19, difference_threshold=6, year_lowerbound=0):
-    dest_file = completed_dir + os.sep + sgf_file_name + "c"
+    dest_file = completed_dir + sgf_file_name + "c"
 
     # first we check if gnugo has already finished this game, if so we just open
     # the .sfgc file can grab final ownership if we haven't munged already, munge
@@ -156,10 +169,8 @@ def finish_sgf_and_get_ownership(sgf_file_path, sgf_file_name, completed_dir,
             return None, None  # failed to finish the game
     else:
         print("gnugo has already finished %s" % dest_file)
-    black_ownership, white_ownership = get_final_ownership(dest_file)
+    black_ownership, white_ownership = get_final_ownership(dest_file, board_size)
     return black_ownership, white_ownership
-
-# this method was used for testing purposes only, the main method will call finish_sgf_and_get_ownership
 
 
 def traverse_directory(source_dir_path, dest_dir_path):
@@ -175,19 +186,3 @@ def traverse_directory(source_dir_path, dest_dir_path):
                     print("Uncaught exception for %s" % filepath)
                 file_count += 1
     print("There were %d files" % (file_count))
-
-
-# testing purposes
-if __name__ == '__main__':
-    source_dir = "/home/justin/Programming/GoAI/Completing_Go_Games/pro_games/1999/1/"
-    dest_dir = "/home/justin/Programming/GoAI/Completing_Go_Games/finished_games/"
-    filename = "YooChangHyuk-YangJaeHo24553.sgf"
-
-    black_ownership, white_ownership = finish_sgf_and_get_ownership(
-        source_dir + filename)
-
-    for i in range(len(black_ownership)):
-        row_str = ""
-        for j in range(len(black_ownership)):
-            row_str += str(int(black_ownership[i][j]))
-        print(row_str)

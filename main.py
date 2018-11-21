@@ -1,8 +1,10 @@
+#!/usr/bin/env python2
+
 import argparse
 import sys
 import json
 
-from munge.go_dataset_preprocessor import munge_all_sgfs
+from munge.data_preprocessor import munge_all_sgfs
 
 
 def mode_preprocess(parser):

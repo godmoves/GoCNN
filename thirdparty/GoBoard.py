@@ -8,10 +8,9 @@ import numpy as np
 
 import GoString
 
+
 # a go board, can apply moves to it, contains gostrings, including their pieces, liberties etc
 # can check for simple ko, and handle captures
-
-
 def _fill(board, i, j, fill_val):
     if i < 0 or j < 0 or i >= len(board) or j >= len(board):
         return
@@ -44,7 +43,7 @@ class GoBoard(object):
         targetString.copyLibertiesFrom(sourceString)
         targetString.removeLiberty(joinPos)
 
-    def addAdjacentLiberty(self, pointString, pos):
+    def addAdjacentLibertyString(self, pointString, pos):
         (row, col) = pos
         if row < 0 or col < 0 or row >= self.boardSize or col >= self.boardSize:
             return
@@ -159,7 +158,7 @@ class GoBoard(object):
         goString = self.goStrings[stringpos]
         goString.insertLiberty(libertypos)
 
-    def addAdjacentLiberty2(self, pos, goString):
+    def addAdjacentLiberty(self, pos, goString):
         (row, col) = pos
         if row < 0 or col < 0 or row > self.boardSize - 1 or col > self.boardSize - 1:
             return
