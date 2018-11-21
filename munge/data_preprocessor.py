@@ -60,7 +60,6 @@ def addToDataFile(datafile, color, move, goBoard, ownership, black_ownership, wh
         5: their stones with 3 or more liberty
         6: simple ko
         7: color to move, 1 for black and 0 for white
-        8: all ones...
     '''
 
     (row, col) = move
@@ -100,9 +99,10 @@ def addToDataFile(datafile, color, move, goBoard, ownership, black_ownership, wh
                     thisbyte = thisbyte | 32
             if goBoard.isSimpleKo(color, pos):
                 thisbyte = thisbyte | 64
-            # if color == 'b':  # mark the color to move
-            #     thisbyte = thisbyte | 128
-            thisbyte = thisbyte | 128
+            if color == 'b':  # mark the color to move
+                thisbyte = thisbyte | 128
+            # all ones
+            # thisbyte = thisbyte | 128
             datafile.write(chr(thisbyte))
 
 
