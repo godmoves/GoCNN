@@ -81,13 +81,16 @@ def finish_sgf(sgf_filepath, dest_file, board_size=19, difference_threshold=6,
     gnugo_path = os.getcwd() + "/gnugo"
     output = run_gungo(gnugo_path, sgf_filepath, dest_file)
 
-    m = re.search(r"([A-Za-z]+) wins by ([0-9\.]+) points", output)
-    if m is None:
-        return False
-    winner = m.group(1)
-    gnu_score = float(m.group(2))
-    if winner == "White":
-        gnu_score *= -1
+    if output == "Jigo\n":
+        gnu_score = 0
+    else:
+        m = re.search(r"([A-Za-z]+) wins by ([0-9\.]+) points", output)
+        if m is None:
+            return False
+        winner = m.group(1)
+        gnu_score = float(m.group(2))
+        if winner == "White":
+            gnu_score *= -1
 
     if np.abs(score - gnu_score) > difference_threshold:
         print("GNU messed up finishing this game... removing %s" % dest_file)

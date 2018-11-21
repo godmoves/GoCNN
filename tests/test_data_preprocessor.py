@@ -6,14 +6,6 @@ from munge.data_preprocessor import walkthroughSgf
 from tests.test_configure import *
 
 
-def rm_test_files(path, suffix):
-    for subdir, dirs, files in os.walk(path):
-        for file in files:
-            filepath = os.path.join(subdir, file)
-            if filepath.endswith(suffix):
-                os.remove(filepath)
-
-
 class TestMungeAll(unittest.TestCase):
     def test_munge_all(self):
         munge_all_sgfs(input_dir, output_dir, completed_dir, board_size, ownership)
@@ -25,8 +17,7 @@ class TestSgfProcess(unittest.TestCase):
     def test_sgf_process(self):
         test_files = ["test_b+1.sgf", "test_draw.sgf", "test_b+r.sgf"]
 
-        for f in test_files:
-            sgf_name = f
+        for sgf_name in test_files:
             sgf_filepath = input_dir + sgf_name
             sgf_file = open(sgf_filepath, 'r')
             sgf_contents = sgf_file.read()
