@@ -9,4 +9,4 @@ install:
   - pip install numpy
   - pip install pandas
 script:
-  pytest
+  python -m unittest discover
