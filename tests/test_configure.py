@@ -7,7 +7,7 @@ board_size = 9
 ownership = True
 
 
-def rm_test_files(path, suffix):
+def rm_test_outputs(path, suffix):
     for subdir, dirs, files in os.walk(path):
         for file in files:
             filepath = os.path.join(subdir, file)

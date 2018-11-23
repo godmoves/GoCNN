@@ -9,8 +9,8 @@ from tests.test_configure import *
 class TestMungeAll(unittest.TestCase):
     def test_munge_all(self):
         munge_all_sgfs(input_dir, output_dir, completed_dir, board_size, ownership)
-        rm_test_files(completed_dir, ".sgfc")
-        rm_test_files(output_dir, ".dat")
+        rm_test_outputs(completed_dir, ".sgfc")
+        rm_test_outputs(output_dir, ".dat")
 
 
 class TestSgfProcess(unittest.TestCase):
@@ -28,8 +28,8 @@ class TestSgfProcess(unittest.TestCase):
             walkthroughSgf(sgf_contents, sgf_filepath, sgf_name, out_filepath,
                            completed_dir, board_size, ownership)
 
-        rm_test_files(completed_dir, ".sgfc")
-        rm_test_files(output_dir, ".dat")
+        rm_test_outputs(completed_dir, ".sgfc")
+        rm_test_outputs(output_dir, ".dat")
 
 
 if __name__ == '__main__':

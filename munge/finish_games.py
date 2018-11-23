@@ -78,7 +78,7 @@ def finish_sgf(sgf_filepath, dest_file, board_size=19, difference_threshold=6,
             print("Game is too old: %s" % sgf_filepath)
             return False
 
-    gnugo_path = os.getcwd() + "/gnugo"
+    gnugo_path = os.path.join(os.getcwd(), "gnugo")
     output = run_gungo(gnugo_path, sgf_filepath, dest_file)
 
     if output == "Jigo\n":
