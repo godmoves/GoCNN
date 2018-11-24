@@ -189,16 +189,6 @@ def munge_sgf(sgf_file_path, sgf_file_name, output_file_path, completed_dir, boa
         # raise
 
 
-def munge_csv(file_path, file_name, file_count, output_file_path_base, completed_dir, board_size, ownership):
-    file = pd.read_csv(file_path)
-    for content in file['sgf']:
-        output_file_path = output_file_path_base + str(file_count) + '.dat'
-        walkthroughSgf(content, file_path, file_name, output_file_path, completed_dir, board_size, ownership)
-        file_count += 1
-
-    return file_count
-
-
 def munge_all_sgfs(input_dir, output_dir, completed_dir, board_size, ownership):
     '''
         recursively traverse the source_dir directory and process every .sgf
@@ -219,13 +209,6 @@ def munge_all_sgfs(input_dir, output_dir, completed_dir, board_size, ownership):
                     continue
                 munge_sgf(filepath, file, output_file_path, completed_dir, board_size, ownership)
                 file_count += 1
-            # elif filepath.endswith(".csv"):
-            #     output_file_path_base = os.path.join(output_dir, file[:-4]) + '_'
-            #     if os.path.isfile(output_file_path_base):
-            #         print("File already exists: %s" % output_file_path_base)
-            #         continue
-            #     file_count = munge_csv(filepath, file, file_count, output_file_path_base,
-            #                            completed_dir, board_size, ownership)
     print("There were %d files" % (file_count))
     if file_count == 0:
         print("No sgf_files were found in the directory, nothing to do.")

@@ -2,10 +2,10 @@
 # (remove dead stones) after removing dead stones we can easily determine final
 # board ownership
 
-import subprocess
 import threading
 import re
 import os
+from subprocess import PIPE, Popen
 
 import gomill.sgf
 import gomill
@@ -41,32 +41,8 @@ def finish_sgf(sgf_filepath, dest_file, board_size=19, difference_threshold=6,
               (board_size, board_size, sgf_filepath))
         return False
 
-    # we first determine the recorded score in the sgf file, this can be compared
-    # with what gnugo determines the score to be
-    match_str = r'RE\[([a-zA-Z0-9_\+\.]+)\]'
-    m = re.search(match_str, contents)
-    if m:
-        result_str = m.group(1)
-
-        # handle draw for cgos rule
-        if result_str == 'Draw':
-            score = 0
-        else:
-            pieces = result_str.split("+")
-            try:
-                winner = pieces[0]
-                if pieces[1] == "" or pieces[1][0].lower() == "r" or pieces[1][0].lower() == "t":
-                    print("Skipping because result was: %s" % result_str)
-                    return False
-                score = float(pieces[1])
-                if winner == "W":
-                    score *= -1
-            except Exception:
-                print("Error parsing result, result_str = %s, file: %s" %
-                      (result_str, sgf_filepath))
-                return False
-    else:
-        print("Couldn't find result, skipping: %s" % sgf_filepath)
+    valid, score = parse_sgf_result(sgf_filepath, contents, board_size)
+    if not valid:
         return False
 
     # check the date of the game and skip if it is too old
@@ -92,17 +68,51 @@ def finish_sgf(sgf_filepath, dest_file, board_size=19, difference_threshold=6,
         if winner == "White":
             gnu_score *= -1
 
-    if np.abs(score - gnu_score) > difference_threshold:
+    if np.abs(score - gnu_score) > difference_threshold and board_size > 9:
         print("GNU messed up finishing this game... removing %s" % dest_file)
         os.remove(dest_file)
         return False
     return True
 
 
+def parse_sgf_result(sgf_filepath, contents, board_size=19):
+    # we first determine the recorded score in the sgf file, this can be compared
+    # with what gnugo determines the score to be
+
+    # for small board size we reserve all games
+    if board_size <= 9:
+        return True, 0
+
+    match_str = r'RE\[([a-zA-Z0-9_\+\.]+)\]'
+    m = re.search(match_str, contents)
+    if m:
+        result_str = m.group(1)
+        # handle draw for cgos rule
+        if result_str == 'Draw':
+            score = 0
+        else:
+            pieces = result_str.split("+")
+            try:
+                winner = pieces[0]
+                if pieces[1] == "" or pieces[1][0].lower() == "r" or pieces[1][0].lower() == "t":
+                    print("Skipping because result was: %s" % result_str)
+                    return False, 0
+                score = float(pieces[1])
+                if winner == "W":
+                    score *= -1
+            except Exception:
+                print("Error parsing result, result_str = %s, file: %s" % (result_str, sgf_filepath))
+                return False, 0
+    else:
+        print("Couldn't find result, skipping: %s" % sgf_filepath)
+        return False, 0
+    return True, score
+
+
 def run_gungo(gnugo_path, sgf_filepath, dest_file):
     # we call gnugo with the appropriate flags to finish the game. gnugo will write the results to dest_file
-    p = subprocess.Popen([gnugo_path, "-l", sgf_filepath, "--outfile", dest_file,
-                          "--score", "aftermath", "--capture-all-dead", "--chinese-rules"], stdout=subprocess.PIPE)
+    p = Popen([gnugo_path, "-l", sgf_filepath, "--outfile", dest_file,
+               "--score", "aftermath", "--capture-all-dead", "--chinese-rules"], stdout=PIPE)
     timer = threading.Timer(10, p.kill)
     try:
         timer.start()
@@ -112,7 +122,6 @@ def run_gungo(gnugo_path, sgf_filepath, dest_file):
         timer.cancel()
 
     print(output)
-
     return output
 
 

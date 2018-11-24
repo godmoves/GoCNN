@@ -5,6 +5,7 @@
 *.sgfc
 
 /gnugo
+/clean_output.sh
 
 checkpoint
 gnugo-3.8
