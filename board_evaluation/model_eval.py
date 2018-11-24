@@ -1,13 +1,11 @@
-import tensorflow as tf
-from . import go_datafile_reader
-
-
-# Visual the outputs of the model.
-# Feature_cube: the x input of model, currently assumes first 6 planes are board position features
-# y_pred: 19x19 matrix of thresholded prediction of final board ownership
-# y_val:  19x19 matrix of probabilities output by model
-# y_true: 19x19 matrix of true board ownership
 def print_info(feature_cube=None, y_pred=None, y_val=None, y_true=None):
+    '''
+        Visual the outputs of the model.
+        Feature_cube: the x input of model, currently assumes first 6 planes are board position features
+        y_pred: 19x19 matrix of thresholded prediction of final board ownership
+        y_val:  19x19 matrix of probabilities output by model
+        y_true: 19x19 matrix of true board ownership
+    '''
     for i in range(19):
         current_row = ""
         if feature_cube is not None:
@@ -49,7 +47,6 @@ def print_info(feature_cube=None, y_pred=None, y_val=None, y_true=None):
 
 
 def test_accuracy(features, targets, x, ownership, count_correct_op, BOARD_SIZE=19):
-
     # I get a memory error when tf tries to feed the whole test set into my GPU, so we will do it in batches
     BATCH_SIZE = 100
     NUM_SAMPLES = len(features)

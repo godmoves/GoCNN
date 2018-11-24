@@ -6,6 +6,7 @@
 
 /gnugo
 /clean_output.sh
+!/tests/data/test.dat
 
 checkpoint
 gnugo-3.8
