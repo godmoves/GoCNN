@@ -1,8 +1,8 @@
 import os
 
-input_dir = "./tests/raw/"
-output_dir = "./tests/input/"
-completed_dir = "./tests/gnugo/"
+input_dir = "./tests/data/raw/"
+output_dir = "./tests/data/input/"
+completed_dir = "./tests/data/gnugo/"
 board_size = 9
 ownership = True
 
