@@ -44,7 +44,7 @@ def mode_train(parser):
     parser.add_argument('-b', '--board_size', dest='board_size', type=int,
                         default=9, help='board size')
     parser.add_argument('--ckpt_path', dest='ckpt_path', type=str,
-                        default='./data/working', help='path to check point')
+                        default='./data/working/test.ckpt', help='path to check point')
 
     args = parser.parse_args()
     params = vars(args)
@@ -55,7 +55,7 @@ def mode_train(parser):
     ckpt_path = params['ckpt_path']
     board_size = params["board_size"]
 
-    nn_trainer(train_dir, test_dir, board_size)
+    nn_trainer(train_dir, test_dir, ckpt_path, board_size, total_steps=1500)
 
 
 if __name__ == '__main__':

@@ -1,7 +1,5 @@
 import tensorflow as tf
 
-BOARD_SIZE = 19
-
 
 def weight_variable(shape):
     initial = tf.truncated_normal(shape, stddev=0.1)
@@ -17,15 +15,15 @@ def conv2d(x, W):
     return tf.nn.conv2d(x, W, strides=[1, 1, 1, 1], padding='SAME')
 
 
-def place_holders():
-    x = tf.placeholder("float", shape=[None, BOARD_SIZE, BOARD_SIZE, 8])
-    ownership = tf.placeholder("float", shape=[None, BOARD_SIZE**2])
+def place_holders(board_size=19):
+    x = tf.placeholder("float", shape=[None, board_size, board_size, 8])
+    ownership = tf.placeholder("float", shape=[None, board_size**2])
     return x, ownership
 
 
-def model(x):
+def model(x, board_size=19):
 
-    x_board = tf.reshape(x, [-1, BOARD_SIZE, BOARD_SIZE, 8])
+    x_board = tf.reshape(x, [-1, board_size, board_size, 8])
     W_conv1 = weight_variable([5, 5, 8, 64])
     b_conv1 = bias_variable([64])
     h_conv1 = tf.nn.relu(conv2d(x_board, W_conv1) + b_conv1)
@@ -51,7 +49,7 @@ def model(x):
     b_convm5 = bias_variable([1])
     h_convm5 = conv2d(h_conv5, W_convm5) + b_convm5
 
-    pred_ownership = tf.sigmoid(tf.reshape(h_convm5, [-1, BOARD_SIZE**2]))
+    pred_ownership = tf.sigmoid(tf.reshape(h_convm5, [-1, board_size**2]))
     return pred_ownership
 
 
