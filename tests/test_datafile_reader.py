@@ -14,7 +14,7 @@ class TestSeekRandomPlace(unittest.TestCase):
     def test_seek_random_place(self):
         file_name = "./tests/data/test.dat"
         with open(file_name) as f:
-            RandomAccessFileReader._seek_random_place_in_file(f, file_name)
+            RandomAccessFileReader._seek_random_place_in_file(f, board_size)
 
 
 if __name__ == '__main__':

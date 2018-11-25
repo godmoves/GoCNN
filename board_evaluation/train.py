@@ -3,10 +3,19 @@ import sys
 
 import numpy as np
 import tensorflow as tf
+import matplotlib.pyplot as plt
 
 from board_evaluation import go_datafile_reader
 from board_evaluation import model
 from board_evaluation import model_eval
+
+
+def rolling_mean(number_list, window=20):
+    means = np.zeros(len(number_list))
+    for i in range(len(means)):
+        sub_window = number_list[i - window + 1: i + 1]
+        means[i] = np.mean(sub_window)
+    return means
 
 
 def read_data_from_dir(data_dir):
@@ -55,8 +64,12 @@ def nn_trainer(train_dir, test_dir, ckpt_path, board_size, total_steps=100000):
     sess = tf.InteractiveSession()
     sess.run(tf.global_variables_initializer())
     saver = tf.train.Saver(tf.global_variables())
-    if os.path.exists(ckpt_path):
-        saver.restore(sess, ckpt_path)
+
+    ckpt_dir, _ = os.path.split(ckpt_path)
+    ckpt = tf.train.latest_checkpoint(ckpt_dir)
+    if ckpt is not None:
+        print("restore from previous checkpoint")
+        saver.restore(sess, ckpt)
 
     training_accuracies = []
     test_accuracies = []

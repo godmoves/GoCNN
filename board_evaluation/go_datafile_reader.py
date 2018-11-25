@@ -1,15 +1,16 @@
 import numpy as np
 import random
 
-# number of bytes in a single sample in a data file
+
+# number of bytes in a single sample in a data file (take board size 19 as an example)
 # 2 bytes = "GO" for data sync
 # 2 bytes for row, col of target move
-# 46 bytes for the final ownership (where the final board is binary and flattened into consecutive bits)
-#  this gives ceiling(19*19 / 8) = 46 bytes
-# 19*19 bytes giving the features of the current board state, with piece liberties, ko position, and an all 1s bit pos
-
+# 46 bytes for the final ownership (where the final board is binary and flattened
+#   into consecutive bits), this gives ceiling(19*19 / 8) = 46 bytes
+# 19*19 bytes giving the features of the current board state, with piece liberties,
+#   ko position, and an all 1s bit pos
+#
 # NUM_BYTES_IN_SAMPLE = 2 + 1 + 1 + 46 + 19 * 19
-NUM_BYTES_IN_SAMPLE = 2 + 1 + 1 + 11 + 9 * 9
 
 
 def _read_sequence(datafile, num_bits):
@@ -46,7 +47,7 @@ class RandomAccessFileReader:
         print("Initializing pointers in %d datafiles, this may take a few minutes" % len(self.datafiles))
         for f in self.datafiles:
             file_obj = open(f, "rb")
-            self._seek_random_place_in_file(file_obj, f)
+            self._seek_random_place_in_file(file_obj, board_size)
             self.open_files.append(file_obj)
 
     def __del__(self):
@@ -55,19 +56,17 @@ class RandomAccessFileReader:
 
     # use resevoir sampling to pick a uniform random sample from the file of unknown number of samples
     @staticmethod
-    def _seek_random_place_in_file(file_obj, file_name=None):
+    def _seek_random_place_in_file(file_obj, board_size=19):
+        num_bytes_in_sample = 2 + 1 + 1 + (board_size ** 2 / 8) + 1 + board_size ** 2
+
         file_pos = file_obj.tell()
         count = 1
         while True:
             temp_pos = file_obj.tell()
-            sample_bytes = file_obj.read(NUM_BYTES_IN_SAMPLE)
+            sample_bytes = file_obj.read(int(num_bytes_in_sample))
             if len(sample_bytes) == 0:
                 break
-            try:
-                assert(sample_bytes[:2] == "GO")
-            except AssertionError as e:
-                print("data with incorrect prefix [%s]: %s" % (sample_bytes[:2], file_name))
-                raise e
+            assert(sample_bytes[:2] == "GO")
             if random.randint(1, count) == 1:
                 file_pos = temp_pos
             count += 1
