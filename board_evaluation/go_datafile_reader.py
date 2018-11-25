@@ -82,7 +82,7 @@ class RandomAccessFileReader:
                 feature_byte = ord(file_obj.read(1))
                 for k in range(8):
                     feature_cube[i][j][k] = ((feature_byte >> k) & 1)
-                assert(((feature_byte >> 7) & 1) == 1)
+                # assert(((feature_byte >> 7) & 1) == 1)
         return feature_cube
 
     def read_sample_from_random_file(self):
@@ -141,7 +141,7 @@ class GoDatafileReader:
                 feature_byte = ord(self.current_file.read(1))
                 for k in range(8):
                     feature_cube[i][j][k] = ((feature_byte >> k) & 1)
-                assert(((feature_byte >> 7) & 1) == 1)
+                # assert(((feature_byte >> 7) & 1) == 1)
         return feature_cube
 
     def read_sample(self):

@@ -1,8 +1,8 @@
 *.dat
 *.pyc
-.ipynb_checkpoints
 *.log
 *.sgfc
+*.ckpt.*
 
 /gnugo
 /clean_output.sh
@@ -10,3 +10,5 @@
 
 checkpoint
 gnugo-3.8
+.cache
+.ipynb_checkpoints
