@@ -1,0 +1,4 @@
+numpy==1.14.2
+pandas==0.22.0
+gomill==0.8.2
+tensorflow==1.10.0

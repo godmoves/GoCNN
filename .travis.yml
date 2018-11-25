@@ -4,10 +4,7 @@ language: python
 python: 
   - "2.7"
 install:
-  - pip install gomill
-  - pip install tensorflow
-  - pip install numpy
-  - pip install pandas
+  - pip install -r requirements.txt
 script:
   ./build_gnugo.sh
   python -m unittest discover
