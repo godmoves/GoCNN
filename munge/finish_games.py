@@ -17,7 +17,7 @@ from thirdparty import GoBoard
 
 
 def finish_sgf(sgf_filepath, dest_file, board_size=19, difference_threshold=6,
-               year_lowerbound=0, gnugo_timeout=10):
+               year_lowerbound=0, gnugo_timeout=10, lower_move_limit=70):
     '''
         gnugo will write the resutls to dest_file returns True if successful and
         False if something went wrong
@@ -34,13 +34,12 @@ def finish_sgf(sgf_filepath, dest_file, board_size=19, difference_threshold=6,
     # I added this to speed up the process. Many files in the dataset were
     # incomplete games, even though the final score was recorded. gnugo would
     # take a long time to finish these incomplete games.
-    if move_count < 50:
+    if move_count < lower_move_limit:
         print("%s only had %d moves" % (sgf_filepath, move_count))
         return False
 
     if contents.find('SZ[%d]' % board_size) < 0:
-        print('not %dx%d, skipping: %s' %
-              (board_size, board_size, sgf_filepath))
+        print('not %dx%d, skipping: %s' % (board_size, board_size, sgf_filepath))
         return False
 
     valid, score = parse_sgf_result(sgf_filepath, contents, board_size)
