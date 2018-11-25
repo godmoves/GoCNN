@@ -1,3 +1,5 @@
+#!/usr/bin/env python2
+
 # BoardEvaluator.py
 import tensorflow as tf
 import sys

@@ -1,3 +1,5 @@
+#!/usr/bin/env python2
+
 # this file contains methods with call gnugo to finish games from sgf files
 # (remove dead stones) after removing dead stones we can easily determine final
 # board ownership

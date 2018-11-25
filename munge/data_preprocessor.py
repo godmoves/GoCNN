@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python2
 
 # Copyright Hugh Perkins 2015 hughperkins at gmail
 #
@@ -28,8 +28,6 @@ import sys
 import os
 
 import gomill
-import gomill.sgf
-import pandas as pd
 
 from munge import finish_games
 from munge import bit_writer

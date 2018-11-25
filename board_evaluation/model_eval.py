@@ -1,3 +1,6 @@
+#!/usr/bin/env python2
+
+
 def print_info(feature_cube=None, y_pred=None, y_val=None, y_true=None):
     '''
         Visual the outputs of the model.

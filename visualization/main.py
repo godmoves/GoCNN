@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python2
 
 '''
 This file contains the main loop which communicates to gogui via the Go Text Protocol (gtp) via stdin.

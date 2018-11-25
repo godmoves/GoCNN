@@ -1,3 +1,6 @@
+#!/usr/bin/env python2
+
+
 def print_info(feature_cube, y_pred, y_true):
     for i in range(19):
         current_row = ""
