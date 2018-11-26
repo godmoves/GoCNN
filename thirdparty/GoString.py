@@ -1,3 +1,5 @@
+#!/usr/bin/env python2
+
 # Copyright Hugh Perkins 2015 hughperkins at gmail
 #
 # This Source Code Form is subject to the terms of the Mozilla Public License,
