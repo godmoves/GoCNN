@@ -1,10 +1,8 @@
 #!/usr/bin/env python2
 import os
-import sys
 
 import numpy as np
 import tensorflow as tf
-import matplotlib.pyplot as plt
 
 from board_evaluation import go_datafile_reader
 from board_evaluation import model

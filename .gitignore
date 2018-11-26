@@ -8,6 +8,7 @@
 /clean_output.sh
 !/tests/data/test.dat
 
+output.txt
 checkpoint
 gnugo-3.8
 .cache

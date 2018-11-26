@@ -17,13 +17,12 @@ import numpy as np
 import os
 from GoDriver import GoDriver
 
-MODEL_PATH = "../data/working/board_eval_cnn_5layer.ckpt"
+MODEL_PATH = "../data/working/test.ckpt"
 
 # everytime we reset the board we will load a random game from this directory to view
-# SGF_DIRECTORY = "/home/justin/Programming/GoAI/Completing_Go_Games/pro_games"
-SGF_DIRECTORY = "../data/sgf_files"
+SGF_DIRECTORY = "./checkpoint"
 
-N = 19  # size of the board
+N = 9  # size of the board
 letter_coords = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T']
 
 # sgf_dir - string, directory containing sgf files

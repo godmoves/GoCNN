@@ -40,8 +40,8 @@ class BoardEvaluator:
         self.x, _ = model.place_holders()
         self.y_conv = model.model(self.x)
         self.sess = tf.InteractiveSession()
-        self.sess.run(tf.initialize_all_variables())
-        saver = tf.train.Saver(tf.all_variables())
+        self.sess.run(tf.global_variables_initializer())
+        saver = tf.train.Saver(tf.global_variables())
         saver.restore(self.sess, tf_ckpt_path)
 
     # feature_cube - [361,8] matrix of floats

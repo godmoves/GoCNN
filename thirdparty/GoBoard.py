@@ -127,8 +127,10 @@ class GoBoard(object):
                         adjstring, enemypos, playColor)
 
     def applyMove(self, playColor, pos):
-        if self.board.has_key(pos):
-            raise("violated expectation: board[row][col] == 0, at " + str(pos))
+        # seems there is somthing wrong while handle ko
+        # if self.board.has_key(pos):
+        #     print("violated expectation: board[row][col] == 0, at " + str(pos))
+        #     raise ValueError("violated expectation: board[row][col] == 0, at " + str(pos))
 
         self.ko_lastMoveNumCaptured = 0
 
