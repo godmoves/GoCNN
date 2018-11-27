@@ -43,6 +43,12 @@ class GoString(object):
         for libertyPos in source.liberties.pieces:
             self.liberties.insert(libertyPos)
 
+    def libStr(self):
+        return str(self.liberties)
+
+    def pieStr(self):
+        return str(self.pieces)
+
     def __str__(self):
         result = "GoString[ pieces=" + \
             str(self.pieces) + " liberties=" + str(self.liberties) + " ]"

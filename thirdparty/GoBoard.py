@@ -28,7 +28,7 @@ def _fill(board, i, j, fill_val):
 class GoBoard(object):
     def __init__(self, boardSize):
         self.ko_lastMoveNumCaptured = 0
-        self.ko_lastMove = -3
+        self.ko_lastMove = 'invalid_point'
         self.boardSize = boardSize
         self.board = {}  # I suppose it can be 'w', 'b' or nothing?
         self.goStrings = {}  # map of pos to gostring
@@ -75,11 +75,10 @@ class GoBoard(object):
         enemyColor = self.otherColor(playColor)
         (row, col) = pos
         # if exactly one stone captured on last move, then need to check for ko...
-        if(self.ko_lastMoveNumCaptured == 1):
+        if self.ko_lastMoveNumCaptured == 1 and self.ko_lastMove != 'invalid_point':
             # is the last move adjacent to us, and do we capture it?
             (lastMoveRow, lastMoveCol) = self.ko_lastMove
-            manhattanDistanceLastMove = abs(
-                lastMoveRow - row) + abs(lastMoveCol - col)
+            manhattanDistanceLastMove = abs(lastMoveRow - row) + abs(lastMoveCol - col)
             if(manhattanDistanceLastMove == 1):
                 lastGoString = self.goStrings.get((lastMoveRow, lastMoveCol))
                 if(lastGoString is not None and lastGoString.numLiberties() == 1):
@@ -103,19 +102,21 @@ class GoBoard(object):
     def checkEnemyLiberty(self, playColor, enemyPos, ourPos):
         (enemyrow, enemycol) = enemyPos
         (ourrow, ourcol) = ourPos
+        # if enemyPos not in board
         if(enemyrow < 0 or enemyrow >= self.boardSize or enemycol < 0 or enemycol >= self.boardSize):
             return
         enemyColor = self.otherColor(playColor)
+        # if enemyPos do not belong to enemy
         if self.board.get(enemyPos) != enemyColor:
             return
         enemyString = self.goStrings[enemyPos]
         if(enemyString is None):
             raise("checkenemyliberty 1 ")
         enemyString.removeLiberty(ourPos)
+        # if the liberty of enemy is 0 after we play, then we kill that group
         if(enemyString.numLiberties() == 0):
             # killed it!
-            # remove all pieces of this string from the board
-            # and remove the string
+            # remove all pieces of this string from the board and remove the string
             # ko stuff
             for enemypos in enemyString.pieces.pieces:
                 (stringrow, stringcol) = enemypos
@@ -124,14 +125,14 @@ class GoBoard(object):
                 self.ko_lastMoveNumCaptured = self.ko_lastMoveNumCaptured + 1
                 for adjstring in [(stringrow - 1, stringcol), (stringrow + 1, stringcol),
                                   (stringrow, stringcol - 1), (stringrow, stringcol + 1)]:
-                    self.addLibertyToAdjacentString(
-                        adjstring, enemypos, playColor)
+                    self.addLibertyToAdjacentString(adjstring, enemypos, playColor)
 
     def applyMove(self, playColor, pos):
         # seems there is somthing wrong while handle ko
-        # if self.board.has_key(pos):
-        #     print("violated expectation: board[row][col] == 0, at " + str(pos))
-        #     raise ValueError("violated expectation: board[row][col] == 0, at " + str(pos))
+        if pos in self.board:
+            raise ValueError("try to play on exist stone at " + str(pos))
+        # if self.isSimpleKo(playColor, pos):
+        #     raise ValueError("try to play on ko move as" + str(pos))
 
         self.ko_lastMoveNumCaptured = 0
 
@@ -223,7 +224,7 @@ class GoBoard(object):
                 if thispiece is None:
                     line = line + '.'
                 if thispiece == 'b':
-                    line = line + '*'
+                    line = line + 'X'
                 if thispiece == 'w':
                     line = line + 'O'
             result = result + line + '\n'
