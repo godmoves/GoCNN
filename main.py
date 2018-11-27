@@ -63,10 +63,10 @@ def mode_gtp(parser):
     parser.add_argument('--model_path', dest='model_path', type=str,
                         default='./data/working/test.ckpt',
                         help='path to tensorflow model')
-    # everytime we reset the board we will load a random game from this directory to view
+    # every time we reset the board we will load a random game from this directory to view
     parser.add_argument('--sgf_dir', dest='sgf_dir', type=str,
                         default='./visualization/checkpoint',
-                        help='dir comtains sgf files')
+                        help='directory contains sgf files')
     parser.add_argument('-b', '--board_size', dest='board_size', type=int,
                         default=9, help='board size')
     args = parser.parse_args()
@@ -81,13 +81,22 @@ def mode_gtp(parser):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
+    help_str = 'Using command:\n  python main.py [mode] [args]\n  '\
+               'Check specific args in each mode by `python main.py [mode] -h`\n'
 
-    mode = sys.argv[1]
+    try:
+        mode = sys.argv[1]
+    except IndexError:
+        print(help_str)
+        raise ValueError('please specify a running mode: [preprocess, train, gtp]')
+
     if mode == 'preprocess':
         mode_preprocess(parser)
     elif mode == 'train':
         mode_train(parser)
     elif mode == 'gtp':
         mode_gtp(parser)
+    elif mode in ['help', '-h', '--help']:
+        print(help_str)
     else:
         raise NotImplementedError("Mode [%s] not implemented" % mode)
