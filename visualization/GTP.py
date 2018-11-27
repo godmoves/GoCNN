@@ -17,10 +17,10 @@ import numpy as np
 import os
 from GoDriver import GoDriver
 
-MODEL_PATH = "../data/working/test.ckpt"
+MODEL_PATH = "./data/working/test.ckpt"
 
 # everytime we reset the board we will load a random game from this directory to view
-SGF_DIRECTORY = "./checkpoint"
+SGF_DIRECTORY = "./visualization/checkpoint"
 
 N = 9  # size of the board
 letter_coords = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T']

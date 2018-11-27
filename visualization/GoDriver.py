@@ -6,10 +6,10 @@ import numpy as np
 import sys
 
 # TODO: fix this relative path, it will cause an import error if gogui is not started from the visualization directory
-sys.path.append("../thirdparty")
-import GoBoard  # this is in the thirdparty directory
+# sys.path.append("../thirdparty")
+from thirdparty import GoBoard  # this is in the thirdparty directory
 import gomill.sgf
-from BoardEvaluator import BoardEvaluator
+from visualization.BoardEvaluator import BoardEvaluator
 
 
 def _swap_color(color):

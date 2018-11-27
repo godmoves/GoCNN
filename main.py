@@ -5,6 +5,7 @@ import json
 
 from munge.data_preprocessor import munge_all_sgfs
 from board_evaluation.train import nn_trainer
+from visualization.GTP import gtp_io
 
 
 def mode_preprocess(parser):
@@ -57,6 +58,11 @@ def mode_train(parser):
     nn_trainer(train_dir, test_dir, ckpt_path, board_size, total_steps=1500)
 
 
+def mode_gtp(parser):
+    parser.add_argument('gtp', help='gtp mode')
+    gtp_io()
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
 
@@ -65,5 +71,7 @@ if __name__ == '__main__':
         mode_preprocess(parser)
     elif mode == 'train':
         mode_train(parser)
+    elif mode == 'gtp':
+        mode_gtp(parser)
     else:
         raise NotImplementedError("Mode [%s] not implemented" % mode)
