@@ -8,7 +8,7 @@
 
 import numpy as np
 
-import GoString
+from thirdparty import GoString
 
 
 # a go board, can apply moves to it, contains gostrings, including their pieces, liberties etc
@@ -49,7 +49,7 @@ class GoBoard(object):
         (row, col) = pos
         if row < 0 or col < 0 or row >= self.boardSize or col >= self.boardSize:
             return
-        if not self.board.has_key(pos):
+        if pos not in self.board:
             pointString.addLiberty(pos)
 
     # dont attempt to merge yet
@@ -122,7 +122,8 @@ class GoBoard(object):
                 del self.board[enemypos]
                 del self.goStrings[enemypos]
                 self.ko_lastMoveNumCaptured = self.ko_lastMoveNumCaptured + 1
-                for adjstring in [(stringrow - 1, stringcol), (stringrow + 1, stringcol), (stringrow, stringcol - 1), (stringrow, stringcol + 1)]:
+                for adjstring in [(stringrow - 1, stringcol), (stringrow + 1, stringcol),
+                                  (stringrow, stringcol - 1), (stringrow, stringcol + 1)]:
                     self.addLibertyToAdjacentString(
                         adjstring, enemypos, playColor)
 
@@ -145,14 +146,10 @@ class GoBoard(object):
         # adjacent strings
         playString = self.createPointString(playColor, pos)
 
-        playString = self.foldStringIfOurs(
-            playString, playColor, (row - 1, col), pos)
-        playString = self.foldStringIfOurs(
-            playString, playColor, (row + 1, col), pos)
-        playString = self.foldStringIfOurs(
-            playString, playColor, (row, col - 1), pos)
-        playString = self.foldStringIfOurs(
-            playString, playColor, (row, col + 1), pos)
+        playString = self.foldStringIfOurs(playString, playColor, (row - 1, col), pos)
+        playString = self.foldStringIfOurs(playString, playColor, (row + 1, col), pos)
+        playString = self.foldStringIfOurs(playString, playColor, (row, col - 1), pos)
+        playString = self.foldStringIfOurs(playString, playColor, (row, col + 1), pos)
 
         self.ko_lastMove = pos
 
@@ -166,7 +163,7 @@ class GoBoard(object):
         (row, col) = pos
         if row < 0 or col < 0 or row > self.boardSize - 1 or col > self.boardSize - 1:
             return
-        if(not self.board.has_key(pos)):
+        if pos not in self.board:
             goString.insertLiberty(pos)
 
     def foldStringIfOurs(self, string2, color, pos, joinpos):

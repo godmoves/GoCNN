@@ -20,13 +20,13 @@ class Bag2d(object):
 
     def insert(self, combo):
         (row, col) = combo
-        if self.board.has_key(combo):
+        if combo in self.board:
             return
         self.pieces.append(combo)
         self.board[combo] = len(self.pieces) - 1
 
     def erase(self, combo):
-        if not self.board.has_key(combo):
+        if combo not in self.board:
             return
         i1d = self.board[combo]
         if i1d == len(self.pieces) - 1:
@@ -40,7 +40,7 @@ class Bag2d(object):
         del self.board[combo]
 
     def exists(self, combo):
-        return self.board.has_key(combo)
+        return combo in self.board
 
     def size(self):
         return len(self.pieces)
