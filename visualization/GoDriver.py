@@ -28,31 +28,34 @@ class GoDriver:
         and be able to make predictions based on the current board.
     '''
 
-    def __init__(self, sgf_filepath, tf_ckpt_path, BOARD_SIZE=19):
-        self.board_evaluator = BoardEvaluator(tf_ckpt_path)
-        self.BOARD_SIZE = BOARD_SIZE
+    def __init__(self, sgf_filepath, tf_ckpt_path, board_size=19):
+        self.board_evaluator = BoardEvaluator(tf_ckpt_path, board_size)
+        self.board_size = board_size
         self.load_sgf_file(sgf_filepath)
         self.color_to_move = "b"
+        self.first_move = True
 
     def load_sgf_file(self, sgf_filepath):
         with open(sgf_filepath, 'r') as sgf_file:
             sgfContents = sgf_file.read()
         self.sgf = gomill.sgf.Sgf_game.from_string(sgfContents)
         print("%s loaded. Winner: %s" % (sgf_filepath, self.sgf.get_winner()), file=sys.stderr)
-        self.board = GoBoard.GoBoard(self.BOARD_SIZE)
+        self.board = GoBoard.GoBoard(self.board_size)
         self.sgf_iterator = self.sgf.main_sequence_iter()
 
     def reset_board(self):
-        self.board = GoBoard.GoBoard(self.BOARD_SIZE)
+        self.board = GoBoard.GoBoard(self.board_size)
         self.sgf_iterator = self.sgf.main_sequence_iter()
+        self.first_move = True
 
     def gen_move(self):
         try:
             it = self.sgf_iterator.next()
             color, move = it.get_move()
-            if move is None:  # sometimes the first move isn't defined
+            if move is None and self.first_move:  # sometimes the first move isn't defined
                 it = self.sgf_iterator.next()
                 color, move = it.get_move()
+                self.first_move = False
 
         except StopIteration:  # at the end of the file
             return "pass"
@@ -63,11 +66,12 @@ class GoDriver:
         self.color_to_move = _swap_color(color)
         (row, col) = move
         self.board.applyMove(color, (row, col))
+        print(str(self.board), file=sys.stderr)
         return row, col
 
     # returns [19,19] matrix of floats indicating the probability black will own
     # the territory at the end of the game
     def evaluate_current_board(self):
         if self.board is None:
-            return np.zeros((19, 19))
+            return np.zeros((self.board_size, self.board_size))
         return self.board_evaluator.evaluate_board(self.board, self.color_to_move)

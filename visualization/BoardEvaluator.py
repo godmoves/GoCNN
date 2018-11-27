@@ -6,9 +6,9 @@ from board_evaluation import model
 import numpy as np
 
 
-def _board_to_feature_cube(goBoard, color_to_move):
+def _board_to_feature_cube(goBoard, color_to_move, board_size, feature_size=8):
     enemy_color = goBoard.otherColor(color_to_move)
-    feature_cube = np.zeros((19, 19, 8))
+    feature_cube = np.zeros((board_size, board_size, feature_size))
     for row in range(goBoard.boardSize):
         for col in range(goBoard.boardSize):
             pos = (row, col)
@@ -33,26 +33,27 @@ def _board_to_feature_cube(goBoard, color_to_move):
 
 
 class BoardEvaluator:
-    def __init__(self, tf_ckpt_path):
+    def __init__(self, tf_ckpt_path, board_size):
         # init the tensorflow model
-        self.x, _ = model.place_holders()
-        self.y_conv = model.model(self.x)
+        self.board_size = board_size
+        self.x, _ = model.place_holders(board_size)
+        self.y_conv = model.model(self.x, board_size)
         self.sess = tf.InteractiveSession()
         self.sess.run(tf.global_variables_initializer())
         saver = tf.train.Saver(tf.global_variables())
         saver.restore(self.sess, tf_ckpt_path)
 
-    # feature_cube - [361,8] matrix of floats
-    # returns - [19,19] matrix of probabilities
+    # feature_cube - [board_size**2, 8] matrix of floats
+    # returns - [board_size, board_size] matrix of probabilities
     def predict_single_sample(self, feature_cube):
         y_pred = self.sess.run(self.y_conv, feed_dict={self.x: [feature_cube]})
-        return np.reshape(y_pred, [19, 19])
+        return np.reshape(y_pred, [self.board_size, self.board_size])
 
     # board - GoBoard object
-    # returns [19,19] matrix of floats, each float in [0,1] indicating
+    # returns [board_size, board_size] matrix of floats, each float in [0,1] indicating
     # probability black owns the territory at the end of the game
     def evaluate_board(self, goBoard, color_to_move):
-        feature_cube = _board_to_feature_cube(goBoard, color_to_move)
+        feature_cube = _board_to_feature_cube(goBoard, color_to_move, self.board_size)
         predicted_ownership = self.predict_single_sample(feature_cube)
 
         # the model was trained on predicting ownership of color to move

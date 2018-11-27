@@ -65,7 +65,7 @@ def gtp_io(sgf_dir, model_path):
                         "none/Load New SGF/loadsgf"]
     sgf_files = get_sgf_filelist(sgf_dir)
     sgf_file = random.choice(sgf_files)
-    driver = GoDriver(sgf_file, model_path)
+    driver = GoDriver(sgf_file, model_path, board_size=N)
 
     print("starting main.py: loading %s" % sgf_file, file=sys.stderr)
     output_file = open("output.txt", "wb")
