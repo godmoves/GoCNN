@@ -2,13 +2,12 @@
 
 # GoDriver.py
 from __future__ import print_function
-import numpy as np
 import sys
 
-# TODO: fix this relative path, it will cause an import error if gogui is not started from the visualization directory
-# sys.path.append("../thirdparty")
-from thirdparty import GoBoard  # this is in the thirdparty directory
+import numpy as np
 import gomill.sgf
+
+from thirdparty import GoBoard  # this is in the thirdparty directory
 from visualization.BoardEvaluator import BoardEvaluator
 
 
@@ -20,14 +19,15 @@ def _swap_color(color):
     raise ValueError("color needs to be w or b")
 
 
-'''
-GoDriver has a pointer to a gomill.Sgf_game object which contains the game tree defined by an sgf file.
-The current position in the file in maintained by the Sgf_game.main_sequence_iter() iterator.
-It also contains a BoardEvaluator object which will load the tensorflow model and be able to make predictions
-based on the current board. '''
-
-
 class GoDriver:
+    '''
+        GoDriver has a pointer to a gomill.Sgf_game object which contains the
+        game tree defined by an sgf file. The current position in the file in
+        maintained by the Sgf_game.main_sequence_iter() iterator. It also
+        contains a BoardEvaluator object which will load the tensorflow model
+        and be able to make predictions based on the current board.
+    '''
+
     def __init__(self, sgf_filepath, tf_ckpt_path, BOARD_SIZE=19):
         self.board_evaluator = BoardEvaluator(tf_ckpt_path)
         self.BOARD_SIZE = BOARD_SIZE
@@ -65,8 +65,8 @@ class GoDriver:
         self.board.applyMove(color, (row, col))
         return row, col
 
-    # returns [19,19] matrix of floats indicating the probability black will own the territory at the end
-    # of the game
+    # returns [19,19] matrix of floats indicating the probability black will own
+    # the territory at the end of the game
     def evaluate_current_board(self):
         if self.board is None:
             return np.zeros((19, 19))

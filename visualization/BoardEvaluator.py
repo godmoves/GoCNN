@@ -2,8 +2,6 @@
 
 # BoardEvaluator.py
 import tensorflow as tf
-import sys
-# sys.path.append("../board_evaluation")
 from board_evaluation import model
 import numpy as np
 
@@ -51,8 +49,8 @@ class BoardEvaluator:
         return np.reshape(y_pred, [19, 19])
 
     # board - GoBoard object
-    # returns [19,19] matrix of floats, each float in [0,1] indicating probability black owns the territory
-    # at the end of the game
+    # returns [19,19] matrix of floats, each float in [0,1] indicating
+    # probability black owns the territory at the end of the game
     def evaluate_board(self, goBoard, color_to_move):
         feature_cube = _board_to_feature_cube(goBoard, color_to_move)
         predicted_ownership = self.predict_single_sample(feature_cube)

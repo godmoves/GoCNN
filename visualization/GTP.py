@@ -17,20 +17,17 @@ import numpy as np
 import os
 from GoDriver import GoDriver
 
-MODEL_PATH = "./data/working/test.ckpt"
-
-# everytime we reset the board we will load a random game from this directory to view
-SGF_DIRECTORY = "./visualization/checkpoint"
 
 N = 9  # size of the board
 letter_coords = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T']
+
 
 # sgf_dir - string, directory containing sgf files
 # returns list of strings
 def get_sgf_filelist(sgf_dir):
     print("Looking for games in %s" % sgf_dir, file=sys.stderr)
     sgf_files = []
-    for subdir, dirs, files in os.walk(SGF_DIRECTORY):
+    for subdir, dirs, files in os.walk(sgf_dir):
         for file in files:
             filepath = os.path.join(subdir, file)
             if filepath.endswith(".sgf"):
@@ -41,31 +38,34 @@ def get_sgf_filelist(sgf_dir):
 
 # go from matrix index to board position string e.g. 0,2 -> A3
 def coord_to_str(row, col):
-    return letter_coords[row] + str(col + 1)
+    # return letter_coords[row] + str(col + 1)
+    return letter_coords[col] + str(row + 1)
 
 
 # ownership_matrix - [N,N] matrix of floats output from the CNN model
-# Formats a valid response string that can be fed into gogui as response to the 'predict_ownership' command
+# Formats a valid response string that can be fed into gogui as response to the
+# 'predict_ownership' command
 def influence_str(ownership_matrix):
     print("Score without komi: %.2f" % np.sum(2 * ownership_matrix - 1), file=sys.stderr)
     rtn_str = "INFLUENCE "
     for i in range(len(ownership_matrix)):
         for j in range(len(ownership_matrix)):
-            rtn_str += "%s %.1lf " % (coord_to_str(i, j), 2 * (ownership_matrix[i][j] - .5))  # convert to [-1,1] scale
+            # convert to [-1,1] scale
+            rtn_str += "%s %.1lf " % (coord_to_str(i, j), 2 * (ownership_matrix[i][j] - .5))
             # rtn_str+= " %.1lf\n" %(ownership_matrix[i][j])
     return rtn_str
 
 
-def gtp_io():
+def gtp_io(sgf_dir, model_path):
     """ Main loop which communicates to gogui via GTP"""
     known_commands = ['boardsize', 'clear_board', 'komi', 'play', 'genmove',
                       'final_score', 'quit', 'name', 'version', 'known_command',
                       'list_commands', 'protocol_version', 'gogui-analyze_commands']
     analyze_commands = ["gfx/Predict Final Ownership/predict_ownership",
                         "none/Load New SGF/loadsgf"]
-    sgf_files = get_sgf_filelist(SGF_DIRECTORY)
+    sgf_files = get_sgf_filelist(sgf_dir)
     sgf_file = random.choice(sgf_files)
-    driver = GoDriver(sgf_file, MODEL_PATH)
+    driver = GoDriver(sgf_file, model_path)
 
     print("starting main.py: loading %s" % sgf_file, file=sys.stderr)
     output_file = open("output.txt", "wb")

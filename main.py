@@ -60,7 +60,15 @@ def mode_train(parser):
 
 def mode_gtp(parser):
     parser.add_argument('gtp', help='gtp mode')
-    gtp_io()
+    parser.add_argument('--model_path', dest='model_path', type=str,
+                        default='./data/working/test.ckpt',
+                        help='path to tensorflow model')
+    # everytime we reset the board we will load a random game from this directory to view
+    parser.add_argument('--sgf_dir', dest='sgf_dir', type=str,
+                        default='./visualization/checkpoint',
+                        help='dir comtains sgf files')
+    args = parser.parse_args()
+    gtp_io(args.sgf_dir, args.model_path)
 
 
 if __name__ == '__main__':
