@@ -67,8 +67,16 @@ def mode_gtp(parser):
     parser.add_argument('--sgf_dir', dest='sgf_dir', type=str,
                         default='./visualization/checkpoint',
                         help='dir comtains sgf files')
+    parser.add_argument('-b', '--board_size', dest='board_size', type=int,
+                        default=9, help='board size')
     args = parser.parse_args()
-    gtp_io(args.sgf_dir, args.model_path)
+    params = vars(args)
+
+    sgf_dir = params['sgf_dir']
+    model_path = params['model_path']
+    board_size = params["board_size"]
+
+    gtp_io(sgf_dir, model_path, board_size)
 
 
 if __name__ == '__main__':

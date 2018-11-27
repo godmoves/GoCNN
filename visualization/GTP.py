@@ -18,8 +18,7 @@ import os
 from GoDriver import GoDriver
 
 
-N = 9  # size of the board
-letter_coords = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T']
+letter_coords = "ABCDEFGHJKLMNOPQRST"
 
 
 # sgf_dir - string, directory containing sgf files
@@ -42,7 +41,7 @@ def coord_to_str(row, col):
     return letter_coords[col] + str(row + 1)
 
 
-# ownership_matrix - [N,N] matrix of floats output from the CNN model
+# ownership_matrix - [board_size, board_size] matrix of floats output from the CNN model
 # Formats a valid response string that can be fed into gogui as response to the
 # 'predict_ownership' command
 def influence_str(ownership_matrix):
@@ -56,7 +55,7 @@ def influence_str(ownership_matrix):
     return rtn_str
 
 
-def gtp_io(sgf_dir, model_path):
+def gtp_io(sgf_dir, model_path, board_size):
     """ Main loop which communicates to gogui via GTP"""
     known_commands = ['boardsize', 'clear_board', 'komi', 'play', 'genmove',
                       'final_score', 'quit', 'name', 'version', 'known_command',
@@ -65,7 +64,7 @@ def gtp_io(sgf_dir, model_path):
                         "none/Load New SGF/loadsgf"]
     sgf_files = get_sgf_filelist(sgf_dir)
     sgf_file = random.choice(sgf_files)
-    driver = GoDriver(sgf_file, model_path, board_size=N)
+    driver = GoDriver(sgf_file, model_path, board_size=board_size)
 
     print("starting main.py: loading %s" % sgf_file, file=sys.stderr)
     output_file = open("output.txt", "wb")
@@ -88,8 +87,9 @@ def gtp_io(sgf_dir, model_path):
             cmdid = ''
         ret = ''
         if command[0] == "boardsize":
-            if int(command[1]) != N:
-                print("Warning: Trying to set incompatible boardsize %s (!= %d)" % (command[1], N), file=sys.stderr)
+            if int(command[1]) != board_size:
+                print("Warning: Trying to set incompatible boardsize %s (!= %d)" % (
+                      command[1], board_size), file=sys.stderr)
         elif command[0] == "clear_board":
             driver.reset_board()
         elif command[0] == "loadsgf":
@@ -144,7 +144,3 @@ def gtp_io(sgf_dir, model_path):
         sys.stdout.flush()
     output_file.write('end of session\n')
     output_file.close()
-
-
-if __name__ == '__main__':
-    gtp_io()
