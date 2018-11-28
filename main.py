@@ -18,7 +18,6 @@ def mode_download(parser):
 
 
 def mode_preprocess(parser):
-    # settings for munging
     parser.add_argument('preprocess', help='preprocess mode')
     parser.add_argument('-i', '--input_dir', dest='input_dir', type=str,
                         default='./data/raw', help='directory containing sgf files as inputk')
@@ -72,20 +71,15 @@ def mode_gtp(parser):
     parser.add_argument('--model_path', dest='model_path', type=str,
                         default='./data/working/test.ckpt',
                         help='path to tensorflow model')
-    # every time we reset the board we will load a random game from this directory to view
-    parser.add_argument('--sgf_dir', dest='sgf_dir', type=str,
-                        default='./visualization/checkpoint',
-                        help='directory contains sgf files')
     parser.add_argument('-b', '--board_size', dest='board_size', type=int,
                         default=9, help='board size')
     args = parser.parse_args()
     params = vars(args)
 
-    sgf_dir = params['sgf_dir']
     model_path = params['model_path']
     board_size = params["board_size"]
 
-    gtp_io(sgf_dir, model_path, board_size)
+    gtp_io(model_path, board_size)
 
 
 if __name__ == '__main__':

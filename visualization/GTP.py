@@ -44,7 +44,7 @@ def influence_str(ownership_matrix):
     return rtn_str
 
 
-def gtp_io(sgf_dir, model_path, board_size):
+def gtp_io(model_path, board_size):
     """ Main loop which communicates to gogui via GTP"""
     known_commands = ['boardsize', 'clear_board', 'komi', 'play', 'list_commands',
                       'final_score', 'quit', 'name', 'version', 'known_command',
