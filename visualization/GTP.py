@@ -2,50 +2,39 @@
 
 '''
 This file contains the main loop which communicates to gogui via the Go Text Protocol (gtp) via stdin.
-We start by loading a random sgf file contained in the SGF_DIRECTORY. You can walk through
-the sgf file by clicking the 'make board_evaluator play' button in gogui. Everytime the
-loadsgf command is sent from gogui (Tools -> Analyze Commands in gogui) we load
-a new random sgf from the directory. When the predict ownership method is called
-we return the models board evaluation prediction on the current state of the board.
+When the predict ownership method is called we return the models board evaluation prediction on the
+current state of the board.
 '''
 
 from __future__ import print_function
 import sys
 import re
-import random
+
 import numpy as np
-import os
+
 from GoDriver import GoDriver
 
 
 letter_coords = "ABCDEFGHJKLMNOPQRST"
 
 
-# sgf_dir - string, directory containing sgf files
-# returns list of strings
-def get_sgf_filelist(sgf_dir):
-    print("Looking for games in %s" % sgf_dir, file=sys.stderr)
-    sgf_files = []
-    for subdir, dirs, files in os.walk(sgf_dir):
-        for file in files:
-            filepath = os.path.join(subdir, file)
-            if filepath.endswith(".sgf"):
-                sgf_files.append(filepath)
-    print("Number of sgf files found: %d" % len(sgf_files), file=sys.stderr)
-    return sgf_files
-
-
 # go from matrix index to board position string e.g. 0,2 -> A3
 def coord_to_str(row, col):
-    # return letter_coords[row] + str(col + 1)
     return letter_coords[col] + str(row + 1)
+
+
+def str_to_coord(move):
+    row = int(move[1:]) - 1
+    col = letter_coords.index(move[0].upper())
+    return (row, col)
 
 
 # ownership_matrix - [board_size, board_size] matrix of floats output from the CNN model
 # Formats a valid response string that can be fed into gogui as response to the
 # 'predict_ownership' command
 def influence_str(ownership_matrix):
-    print("Score without komi: %.2f" % np.sum(2 * ownership_matrix - 1), file=sys.stderr)
+    score = np.sum(2 * ownership_matrix - 1) - 7
+    print("Score (komi=7): %.2f" % score, file=sys.stderr)
     rtn_str = "INFLUENCE "
     for i in range(len(ownership_matrix)):
         for j in range(len(ownership_matrix)):
@@ -57,18 +46,14 @@ def influence_str(ownership_matrix):
 
 def gtp_io(sgf_dir, model_path, board_size):
     """ Main loop which communicates to gogui via GTP"""
-    known_commands = ['boardsize', 'clear_board', 'komi', 'play', 'genmove',
+    known_commands = ['boardsize', 'clear_board', 'komi', 'play', 'list_commands',
                       'final_score', 'quit', 'name', 'version', 'known_command',
-                      'list_commands', 'protocol_version', 'gogui-analyze_commands']
-    analyze_commands = ["gfx/Predict Final Ownership/predict_ownership",
-                        "none/Load New SGF/loadsgf"]
-    sgf_files = get_sgf_filelist(sgf_dir)
-    sgf_file = random.choice(sgf_files)
-    driver = GoDriver(sgf_file, model_path, board_size=board_size)
+                      'protocol_version', 'gogui-analyze_commands']
+    analyze_commands = ["gfx/Predict Final Ownership/predict_ownership"]
+    driver = GoDriver(model_path, board_size=board_size)
 
-    print("starting main.py: loading %s" % sgf_file, file=sys.stderr)
     output_file = open("output.txt", "wb")
-    output_file.write("intializing\n")
+    output_file.write("board evaluator initializing\n")
     while True:
         try:
             line = raw_input().strip()
@@ -92,24 +77,17 @@ def gtp_io(sgf_dir, model_path, board_size):
                       command[1], board_size), file=sys.stderr)
         elif command[0] == "clear_board":
             driver.reset_board()
-        elif command[0] == "loadsgf":
-            sgf_file = random.choice(sgf_files)
-            print("Loading new file: %s" % sgf_file, file=sys.stderr)
-            print("Make sure to click 'Clear board and start new game' in the gui", file=sys.stderr)
-            driver.load_sgf_file(sgf_file)
         elif command[0] == "komi":
             pass
         elif command[0] == "play":
-            pass
-            print("play", file=sys.stderr)
-        elif command[0] == "genmove":
-            # color_str = command[1] #currently we ignore this
-            tup = driver.gen_move()
-            if tup == "pass":
-                ret = "pass"
+            color = command[1][0]
+            move = command[2]
+            if move != 'pass':
+                (row, col) = str_to_coord(move)
+                driver.play(color, (row, col))
             else:
-                ret = coord_to_str(tup[0], tup[1])
-            print("genmove", file=sys.stderr)
+                driver.play(color, move)
+            print(str(driver.board), file=sys.stderr)
         elif command[0] == "final_score":
             print("final_score not implemented", file=sys.stderr)
         elif command[0] == "name":
