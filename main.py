@@ -6,6 +6,15 @@ import json
 from munge.data_preprocessor import munge_all_sgfs
 from board_evaluation.train import nn_trainer
 from visualization.GTP import gtp_io
+from data.download_data import download_cgos_data
+
+
+def mode_download(parser):
+    parser.add_argument('download', help='mode download')
+    parser.add_argument('--save_path', dest='save_path', type=str,
+                        default='./data/raw', help='path to save all data files')
+    args = parser.parse_args()
+    download_cgos_data(args.save_path)
 
 
 def mode_preprocess(parser):
@@ -88,9 +97,11 @@ if __name__ == '__main__':
         mode = sys.argv[1]
     except IndexError:
         print(help_str)
-        raise ValueError('please specify a running mode: [preprocess, train, gtp]')
+        raise ValueError('please specify a running mode: [download, preprocess, train, gtp]')
 
-    if mode == 'preprocess':
+    if mode == 'download':
+        mode_download(parser)
+    elif mode == 'preprocess':
         mode_preprocess(parser)
     elif mode == 'train':
         mode_train(parser)
