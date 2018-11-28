@@ -17,9 +17,8 @@
 # final state of the board (remove dead stones, fill in dame, etc.) and changed
 # how it traverses directories.
 
-# See main at bottom of file. This file will recursively traverse a directory for
-# all .sgf files and convert the moves in those games to a binary format which
-# can be used downstream for a CNN.
+# This file will recursively traverse a directory for all .sgf files and convert
+# he moves in those games to a binary format which can be used downstream for a CNN.
 
 from __future__ import absolute_import
 from __future__ import division
@@ -34,6 +33,7 @@ from munge import bit_writer
 from thirdparty import GoBoard
 
 
+# this function is related to _board_to_feature_cube in thirdparty/BoardEvaluator
 def addToDataFile(datafile, color, move, goBoard, ownership, black_ownership, white_ownership, board_size):
     '''
         datafile is an open binary file we are writing to

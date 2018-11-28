@@ -6,6 +6,7 @@ from board_evaluation import model
 import numpy as np
 
 
+# this funtion is related to addToDataFile in munge/data_preprocessor
 def _board_to_feature_cube(goBoard, color_to_move, board_size, feature_size=8):
     enemy_color = goBoard.otherColor(color_to_move)
     feature_cube = np.zeros((board_size, board_size, feature_size))
@@ -28,7 +29,10 @@ def _board_to_feature_cube(goBoard, color_to_move, board_size, feature_size=8):
                     feature_cube[row][col][5] = 1.0
             if goBoard.isSimpleKo(color_to_move, pos):  # FIX THIS!
                 feature_cube[row][col][6] = 1.0
-            feature_cube[row][col][7] = 1.0
+            if color_to_move == 'b':
+                feature_cube[row][col][7] = 1.0
+            else:
+                assert color_to_move == 'w'
     return feature_cube
 
 
