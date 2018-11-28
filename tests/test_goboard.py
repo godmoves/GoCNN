@@ -63,11 +63,11 @@ class TestGOBoard(unittest.TestCase):
         gb.applyMove('w', (2, 2))
         gb.applyMove('w', (1, 2))
         gb.applyMove('w', (0, 2))
-        target = 'GoBoard\nOOO\n..O\n..O\n'
+        target = 'GoBoard\n   A B C \n 3 O O O \n 2 . . O \n 1 . . O \n'
         self.assertEqual(str(gb), target)
 
         gb.applyMove('w', (0, 0))
-        target = 'GoBoard\nOOO\n..O\nO.O\n'
+        target = 'GoBoard\n   A B C \n 3 O O O \n 2 . . O \n 1 O . O \n'
         self.assertEqual(str(gb), target)
 
     def test_get_final_ownership(self):
