@@ -83,7 +83,7 @@ def nn_trainer(train_dir, test_dir, ckpt_path, board_size, total_steps=100000):
 
         if k % 1000 == 0:
             test_accuracy = model_eval.test_accuracy(
-                test_features, test_targets, x, ownership, correct_count, board_size=board_size)
+                test_features, test_targets, x, ownership, correct_count, board_size)
             test_accuracies.append(test_accuracy)
             print("Test accuracy: %f" % test_accuracy)
         if k % 1000 == 0:
