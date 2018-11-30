@@ -7,11 +7,8 @@
 *.data-*
 *.csv
 
-/gnugo
 !/tests/data/test.dat
 
-clean_output.sh
-output.txt
 checkpoint
 gnugo-3.8
 .cache

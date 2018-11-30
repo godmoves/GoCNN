@@ -1,14 +1,15 @@
 #!/bin/bash
+GNUGO="gnugo-3.8/interface/gnugo"
 
-if [ -e "gnugo" ]; then
+cd $(dirname $0)
+
+if [ -e $GNUGO ]; then
     echo "gnugo already exists"
 else
-    cd thirdparty
     wget http://ftp.gnu.org/gnu/gnugo/gnugo-3.8.tar.gz
     tar -xzf gnugo-3.8.tar.gz
     cd gnugo-3.8
     ./configure
     make
-    cp ./interface/gnugo ../../
-    cd ../../
+    rm gnugo-3.8.tar.gz
 fi
