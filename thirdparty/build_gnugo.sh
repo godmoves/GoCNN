@@ -11,5 +11,4 @@ else
     cd gnugo-3.8
     ./configure
     make
-    rm gnugo-3.8.tar.gz
 fi

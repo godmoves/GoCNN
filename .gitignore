@@ -6,6 +6,7 @@
 *.meta
 *.data-*
 *.csv
+*.tar.gz
 
 !/tests/data/test.dat
 
