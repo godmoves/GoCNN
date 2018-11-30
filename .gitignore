@@ -2,12 +2,15 @@
 *.pyc
 *.log
 *.sgfc
-*.ckpt.*
+*.index
+*.meta
+*.data-*
+*.csv
 
 /gnugo
-/clean_output.sh
 !/tests/data/test.dat
 
+clean_output.sh
 output.txt
 checkpoint
 gnugo-3.8

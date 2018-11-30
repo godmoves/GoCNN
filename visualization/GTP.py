@@ -52,15 +52,11 @@ def gtp_io(model_path, board_size):
     analyze_commands = ["gfx/Predict Final Ownership/predict_ownership"]
     driver = GoDriver(model_path, board_size=board_size)
 
-    output_file = open("output.txt", "wb")
-    output_file.write("board evaluator initializing\n")
     while True:
         try:
             line = raw_input().strip()
             print(line, file=sys.stderr)
-            output_file.write(line + "\n")
         except EOFError:
-            output_file.write('Breaking!!\n')
             break
         if line == '':
             continue
@@ -114,11 +110,7 @@ def gtp_io(model_path, board_size):
             ret = None
 
         if ret is not None:
-            output_file.write("returning: '=%s %s'\n" % (cmdid, ret,))
             print('=%s %s\n\n' % (cmdid, ret,), end='')
         else:
-            output_file.write("returning: '=?%s ???'\n" % (cmdid))
             print('?%s ???\n\n' % (cmdid,), end='')
         sys.stdout.flush()
-    output_file.write('end of session\n')
-    output_file.close()
