@@ -50,8 +50,8 @@ def nn_trainer(train_dir, test_dir, ckpt_path, board_size, total_steps=100000):
         test_features.append(feature_cube)
         test_targets.append(final_state)
 
-    x, ownership = model.place_holders(board_size=9)
-    y_conv = model.model(x, board_size=9)
+    x, ownership = model.place_holders(board_size=board_size)
+    y_conv = model.model(x, board_size=board_size)
     loss = model.loss_function(ownership, y_conv)
     train_op = model.train_step(loss)
 
@@ -83,7 +83,7 @@ def nn_trainer(train_dir, test_dir, ckpt_path, board_size, total_steps=100000):
 
         if k % 1000 == 0:
             test_accuracy = model_eval.test_accuracy(
-                test_features, test_targets, x, ownership, correct_count)
+                test_features, test_targets, x, ownership, correct_count, board_size=board_size)
             test_accuracies.append(test_accuracy)
             print("Test accuracy: %f" % test_accuracy)
         if k % 1000 == 0:

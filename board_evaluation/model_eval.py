@@ -47,7 +47,7 @@ def print_info(feature_cube=None, y_pred=None, y_val=None, y_true=None, board_si
                     current_row += '0'
                 else:
                     current_row += '*'
-            print(current_row)
+        print(current_row)
 
 
 def test_accuracy(features, targets, x, ownership, count_correct_op, board_size=19):
