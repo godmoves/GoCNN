@@ -53,6 +53,8 @@ def mode_train(parser):
                         default=9, help='board size')
     parser.add_argument('--ckpt_path', dest='ckpt_path', type=str,
                         default='./data/working/cnn_5layer_64filter', help='path to check point')
+    parser.add_argument('--steps', dest='steps', type=int,
+                        default=100000, help='total training steps')
 
     args = parser.parse_args()
     params = vars(args)
@@ -62,8 +64,9 @@ def mode_train(parser):
     test_dir = params['test_dir']
     ckpt_path = params['ckpt_path']
     board_size = params["board_size"]
+    steps = params['steps']
 
-    nn_trainer(train_dir, test_dir, ckpt_path, board_size)
+    nn_trainer(train_dir, test_dir, ckpt_path, board_size, total_steps=steps)
 
 
 def mode_gtp(parser):
