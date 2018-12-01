@@ -22,31 +22,31 @@ def place_holders(board_size=19):
     return x, ownership
 
 
-def model(x, board_size=19):
+def model(x, board_size=19, filter_size=64):
 
     x_board = tf.reshape(x, [-1, board_size, board_size, 8])
-    W_conv1 = weight_variable([5, 5, 8, 64])
-    b_conv1 = bias_variable([64])
+    W_conv1 = weight_variable([5, 5, 8, filter_size])
+    b_conv1 = bias_variable([filter_size])
     h_conv1 = tf.nn.relu(conv2d(x_board, W_conv1) + b_conv1)
 
-    W_conv2 = weight_variable([5, 5, 64, 64])
-    b_conv2 = bias_variable([64])
+    W_conv2 = weight_variable([5, 5, filter_size, filter_size])
+    b_conv2 = bias_variable([filter_size])
     h_conv2 = tf.nn.relu(conv2d(h_conv1, W_conv2) + b_conv2)
 
-    W_conv3 = weight_variable([5, 5, 64, 64])
-    b_conv3 = bias_variable([64])
+    W_conv3 = weight_variable([5, 5, filter_size, filter_size])
+    b_conv3 = bias_variable([filter_size])
     h_conv3 = tf.nn.relu(conv2d(h_conv2, W_conv3) + b_conv3)
 
-    W_conv4 = weight_variable([5, 5, 64, 48])
-    b_conv4 = bias_variable([48])
+    W_conv4 = weight_variable([5, 5, filter_size, filter_size])
+    b_conv4 = bias_variable([filter_size])
     h_conv4 = tf.nn.relu(conv2d(h_conv3, W_conv4) + b_conv4)
 
-    W_conv5 = weight_variable([5, 5, 48, 48])
-    b_conv5 = bias_variable([48])
+    W_conv5 = weight_variable([5, 5, filter_size, filter_size])
+    b_conv5 = bias_variable([filter_size])
     h_conv5 = tf.nn.relu(conv2d(h_conv4, W_conv5) + b_conv5)
 
     # Final outputs from layer 5
-    W_convm5 = weight_variable([5, 5, 48, 1])
+    W_convm5 = weight_variable([5, 5, filter_size, 1])
     b_convm5 = bias_variable([1])
     h_convm5 = conv2d(h_conv5, W_convm5) + b_convm5
 
