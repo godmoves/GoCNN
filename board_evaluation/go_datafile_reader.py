@@ -1,6 +1,7 @@
 #!/usr/bin/env python2
 import numpy as np
 import random
+from tqdm import tqdm
 
 
 # number of bytes in a single sample in a data file (take board size 19 as an example)
@@ -46,7 +47,7 @@ class RandomAccessFileReader:
 
         self.open_files = []
         print("Initializing pointers in %d datafiles, this may take a few minutes" % len(self.datafiles))
-        for f in self.datafiles:
+        for f in tqdm(self.datafiles):
             file_obj = open(f, "rb")
             self._seek_random_place_in_file(file_obj, board_size)
             self.open_files.append(file_obj)
