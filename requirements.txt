@@ -2,3 +2,4 @@ gomill==0.8.2
 matplotlib==2.2.3
 pandas==0.22.0
 numpy==1.14.2
+tqdm==4.8.1
