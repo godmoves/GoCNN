@@ -11,7 +11,7 @@ def print_info(feature_cube=None, y_pred=None, y_val=None, y_true=None, board_si
         board_size:   board size
     '''
     error_count = 0
-    for i in range(board_size):
+    for i in reversed(range(board_size)):
         current_row = ""
         if feature_cube is not None:
             for j in range(board_size):

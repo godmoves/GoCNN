@@ -20,7 +20,7 @@ def mode_download(parser):
 def mode_preprocess(parser):
     parser.add_argument('preprocess', help='preprocess mode')
     parser.add_argument('-i', '--input_dir', dest='input_dir', type=str,
-                        default='./data/raw', help='directory containing sgf files as inputk')
+                        default='./data/raw', help='directory containing sgf files as input')
     parser.add_argument('-o', '--output_dir', dest='output_dir', type=str,
                         default='./data/input', help='output directory to write processed binary files to')
     parser.add_argument('-c', '--completed_dir', dest='completed_dir', default='./data/gnugo',
