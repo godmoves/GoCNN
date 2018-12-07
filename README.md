@@ -40,33 +40,33 @@ We use an ADAM optimizer with learning rate 10e-4.
 ## Training Pipeline
 
 1. Create a separate environment for GoCNN (optional)
-```
-conda create -n gocnn python=2.7
-source activate gocnn
-```
+    ```
+    conda create -n gocnn python=2.7
+    source activate gocnn
+    ```
 
 2. Install what is needed:  
-The following packages are required by the training code:
+    The following packages are required by the training code:
 
-- gomill
-- matplotlib
-- pandas
-- numpy
-- tqdm
-- TensorFlow
+    - gomill
+    - matplotlib
+    - pandas
+    - numpy
+    - tqdm
+    - TensorFlow
 
-Just install install them by: 
-```
-pip install -r requirements.txt
-```
-You can install a GPU version of TensorFlow if you have a decent GPU, or just install the CPU version.
-```
-# For CPU version
-pip install tensorflow
+    Just install install them by: 
+    ```
+    pip install -r requirements.txt
+    ```
+    You can install a GPU version of TensorFlow if you have a decent GPU, or just install the CPU version.
+    ```
+    # For CPU version
+    pip install tensorflow
 
-# For GPU version
-pip install tensorflow_gpu
-```
+    # For GPU version
+    pip install tensorflow_gpu
+    ```
 
 3. Build GnuGo. GnuGo is used to remove the dead stones from the board, you can build is by using this command;
     ```
@@ -74,35 +74,36 @@ pip install tensorflow_gpu
     ```
 
 4. Get training data. You can use your own collected sgf files and put them all into `./data/raw`, or just download [CGOS 9x9 Go data](http://www.yss-aya.com/cgos/9x9/archive.html) using:
-```
-python main.py download
-```
+    ```
+    python main.py download
+    ```
 
 5. Preprocess data. This will pick out the sgfs that can be used in our NN training, and convert them into the target format we mentioned in feature part.
-```
-python main.py preprocess
-```
+    ```
+    python main.py preprocess
+    ```
 
 6. Split data into training and test set. By default, 1% games are split into test set and not used to train the network.
-```
-bash ./data/input/move_to_test.sh
-```
+    ```
+    bash ./data/input/move_to_test.sh
+    ```
 
 7. Start the training.
-```
-python main.py train
-```
+    ```
+    python main.py train
+    ```
 
 8. After the training finished, you can check out your training result by running the program in GTP mode and play with it interactively through [GoGui](https://sourceforge.net/projects/gogui/):
-```
-python main.py gtp
-```
+    ```
+    python main.py gtp
+    ```
 
 ### Some Tips
 
 For more information about the training settings, you can check it by `python main.py -h`.
 
 ## Third party libraries/software used
+
 * Modified some code from
 [kgsgo-dataset-preprocessor](https://github.com/hughperkins/kgsgo-dataset-preprocessor)
 to do data munging.
