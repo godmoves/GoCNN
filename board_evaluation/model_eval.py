@@ -10,7 +10,8 @@ def print_info(feature_cube=None, y_pred=None, y_val=None, y_true=None, board_si
         y_true:       board_size x board_size matrix of true board ownership
         board_size:   board size
     '''
-    for i in range(board_size):
+    error_count = 0
+    for i in reversed(range(board_size)):
         current_row = ""
         if feature_cube is not None:
             for j in range(board_size):
@@ -47,7 +48,16 @@ def print_info(feature_cube=None, y_pred=None, y_val=None, y_true=None, board_si
                     current_row += '0'
                 else:
                     current_row += '*'
-            print(current_row)
+            current_row += "   "
+        if y_pred is not None and y_true is not None:
+            for j in range(board_size):
+                if y_pred[i][j] == y_true[i][j]:
+                    current_row += '.'
+                else:
+                    current_row += 'X'
+                    error_count += 1
+        print(current_row)
+    return error_count
 
 
 def test_accuracy(features, targets, x, ownership, count_correct_op, board_size=19):

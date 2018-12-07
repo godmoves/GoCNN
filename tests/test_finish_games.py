@@ -50,7 +50,7 @@ class TestParseResult(unittest.TestCase):
 
 class TestGnugo(unittest.TestCase):
     def test_gnugo(self):
-        gnugo_path = os.path.join(os.getcwd(), "gnugo")
+        gnugo_path = os.path.join(os.getcwd(), "thirdparty/gnugo-3.8/interface/gnugo")
         test_files = ["test_b+r.sgf", "test_draw.sgf", "test_b+1.sgf"]
 
         for sgf_name in test_files:

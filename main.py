@@ -6,13 +6,21 @@ import json
 from munge.data_preprocessor import munge_all_sgfs
 from board_evaluation.train import nn_trainer
 from visualization.GTP import gtp_io
+from data.download_data import download_cgos_data
+
+
+def mode_download(parser):
+    parser.add_argument('download', help='mode download')
+    parser.add_argument('--save_path', dest='save_path', type=str,
+                        default='./data/raw', help='path to save all data files')
+    args = parser.parse_args()
+    download_cgos_data(args.save_path)
 
 
 def mode_preprocess(parser):
-    # settings for munging
     parser.add_argument('preprocess', help='preprocess mode')
     parser.add_argument('-i', '--input_dir', dest='input_dir', type=str,
-                        default='./data/raw', help='directory containing sgf files as inputk')
+                        default='./data/raw', help='directory containing sgf files as input')
     parser.add_argument('-o', '--output_dir', dest='output_dir', type=str,
                         default='./data/input', help='output directory to write processed binary files to')
     parser.add_argument('-c', '--completed_dir', dest='completed_dir', default='./data/gnugo',
@@ -44,7 +52,9 @@ def mode_train(parser):
     parser.add_argument('-b', '--board_size', dest='board_size', type=int,
                         default=9, help='board size')
     parser.add_argument('--ckpt_path', dest='ckpt_path', type=str,
-                        default='./data/working/test.ckpt', help='path to check point')
+                        default='./data/working/cnn_5layer_64filter', help='path to check point')
+    parser.add_argument('--steps', dest='steps', type=int,
+                        default=100000, help='total training steps')
 
     args = parser.parse_args()
     params = vars(args)
@@ -54,29 +64,25 @@ def mode_train(parser):
     test_dir = params['test_dir']
     ckpt_path = params['ckpt_path']
     board_size = params["board_size"]
+    steps = params['steps']
 
-    nn_trainer(train_dir, test_dir, ckpt_path, board_size, total_steps=1500)
+    nn_trainer(train_dir, test_dir, ckpt_path, board_size, total_steps=steps)
 
 
 def mode_gtp(parser):
     parser.add_argument('gtp', help='gtp mode')
     parser.add_argument('--model_path', dest='model_path', type=str,
-                        default='./data/working/test.ckpt',
+                        default='./data/working/cnn_5layer_64filter',
                         help='path to tensorflow model')
-    # every time we reset the board we will load a random game from this directory to view
-    parser.add_argument('--sgf_dir', dest='sgf_dir', type=str,
-                        default='./visualization/checkpoint',
-                        help='directory contains sgf files')
     parser.add_argument('-b', '--board_size', dest='board_size', type=int,
                         default=9, help='board size')
     args = parser.parse_args()
     params = vars(args)
 
-    sgf_dir = params['sgf_dir']
     model_path = params['model_path']
     board_size = params["board_size"]
 
-    gtp_io(sgf_dir, model_path, board_size)
+    gtp_io(model_path, board_size)
 
 
 if __name__ == '__main__':
@@ -88,9 +94,11 @@ if __name__ == '__main__':
         mode = sys.argv[1]
     except IndexError:
         print(help_str)
-        raise ValueError('please specify a running mode: [preprocess, train, gtp]')
+        raise ValueError('please specify a running mode: [download, preprocess, train, gtp]')
 
-    if mode == 'preprocess':
+    if mode == 'download':
+        mode_download(parser)
+    elif mode == 'preprocess':
         mode_preprocess(parser)
     elif mode == 'train':
         mode_train(parser)

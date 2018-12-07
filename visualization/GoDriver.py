@@ -1,11 +1,7 @@
 #!/usr/bin/env python2
 
 # GoDriver.py
-from __future__ import print_function
-import sys
-
 import numpy as np
-import gomill.sgf
 
 from thirdparty import GoBoard  # this is in the thirdparty directory
 from visualization.BoardEvaluator import BoardEvaluator
@@ -28,46 +24,20 @@ class GoDriver:
         and be able to make predictions based on the current board.
     '''
 
-    def __init__(self, sgf_filepath, tf_ckpt_path, board_size=19):
+    def __init__(self, tf_ckpt_path, board_size=19):
         self.board_evaluator = BoardEvaluator(tf_ckpt_path, board_size)
         self.board_size = board_size
-        self.load_sgf_file(sgf_filepath)
         self.color_to_move = "b"
-        self.first_move = True
-
-    def load_sgf_file(self, sgf_filepath):
-        with open(sgf_filepath, 'r') as sgf_file:
-            sgfContents = sgf_file.read()
-        self.sgf = gomill.sgf.Sgf_game.from_string(sgfContents)
-        print("%s loaded. Winner: %s" % (sgf_filepath, self.sgf.get_winner()), file=sys.stderr)
-        self.board = GoBoard.GoBoard(self.board_size)
-        self.sgf_iterator = self.sgf.main_sequence_iter()
 
     def reset_board(self):
         self.board = GoBoard.GoBoard(self.board_size)
-        self.sgf_iterator = self.sgf.main_sequence_iter()
-        self.first_move = True
+        self.color_to_move = "b"
 
-    def gen_move(self):
-        try:
-            it = self.sgf_iterator.next()
-            color, move = it.get_move()
-            if move is None and self.first_move:  # sometimes the first move isn't defined
-                it = self.sgf_iterator.next()
-                color, move = it.get_move()
-                self.first_move = False
-
-        except StopIteration:  # at the end of the file
-            return "pass"
-
-        if move is None:
-            return "pass"
-
+    def play(self, color, move):
+        if move != 'pass':
+            (row, col) = move
+            self.board.applyMove(color, (row, col))
         self.color_to_move = _swap_color(color)
-        (row, col) = move
-        self.board.applyMove(color, (row, col))
-        print(str(self.board), file=sys.stderr)
-        return row, col
 
     # returns [19,19] matrix of floats indicating the probability black will own
     # the territory at the end of the game

@@ -43,15 +43,13 @@ def nn_trainer(train_dir, test_dir, ckpt_path, board_size, total_steps=100000):
     test_reader.num_epochs = 0
     test_features = []
     test_targets = []
-    test_move_numbers = []
-    while(test_reader.num_epochs == 0):
-        test_move_numbers.append(test_reader.move_index)
+    while test_reader.num_epochs == 0:
         final_state, _, feature_cube = test_reader.read_sample()
         test_features.append(feature_cube)
         test_targets.append(final_state)
 
-    x, ownership = model.place_holders(board_size=9)
-    y_conv = model.model(x, board_size=9)
+    x, ownership = model.place_holders(board_size=board_size)
+    y_conv = model.model(x, board_size=board_size)
     loss = model.loss_function(ownership, y_conv)
     train_op = model.train_step(loss)
 
@@ -70,22 +68,23 @@ def nn_trainer(train_dir, test_dir, ckpt_path, board_size, total_steps=100000):
         print("restore from previous checkpoint")
         saver.restore(sess, ckpt)
 
-    training_accuracies = []
-    test_accuracies = []
+    best_test_accuracy = 0
     for k in range(total_steps):
-        x_batch, y_batch = reader.get_batch(50)
+        x_batch, y_batch = reader.get_batch(64)
         _, loss_value, y_value = sess.run([train_op, loss, y_conv], feed_dict={
                                           x: x_batch, ownership: y_batch})
         if k % 10 == 0:
             acc = accuracy.eval(feed_dict={x: x_batch, ownership: y_batch})
-            training_accuracies.append(acc)
             print("step=%d, loss=%f. acc=%f" % (k, loss_value, acc))
 
         if k % 1000 == 0:
             test_accuracy = model_eval.test_accuracy(
-                test_features, test_targets, x, ownership, correct_count)
-            test_accuracies.append(test_accuracy)
+                test_features, test_targets, x, ownership, correct_count, board_size)
             print("Test accuracy: %f" % test_accuracy)
-        if k % 1000 == 0:
-            print("Saving Checkpoint...")
-            saver.save(sess, ckpt_path)
+            if test_accuracy > best_test_accuracy:
+                print("New best test accuracy, saving checkpoint...")
+                saver.save(sess, ckpt_path)
+                best_test_accuracy = test_accuracy
+            else:
+                print('Test accuracy %s less than %s, no progress...' % (
+                    test_accuracy, best_test_accuracy))

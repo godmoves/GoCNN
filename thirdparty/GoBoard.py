@@ -216,16 +216,18 @@ class GoBoard(object):
         return board
 
     def __str__(self):
-        result = 'GoBoard\n'
+        result = 'GoBoard\n   '
+        letter_coords = 'A B C D E F G H J K L M N O P Q R S T'
+        result += letter_coords[:2 * self.boardSize] + '\n'
         for i in range(self.boardSize - 1, -1, -1):
-            line = ''
+            line = '%2d ' % (i + 1)
             for j in range(0, self.boardSize):
                 thispiece = self.board.get((i, j))
                 if thispiece is None:
-                    line = line + '.'
+                    line = line + '. '
                 if thispiece == 'b':
-                    line = line + 'X'
+                    line = line + 'X '
                 if thispiece == 'w':
-                    line = line + 'O'
+                    line = line + 'O '
             result = result + line + '\n'
         return result
