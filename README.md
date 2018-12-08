@@ -2,27 +2,25 @@
 
 ![travisci](https://travis-ci.com/godmoves/GoCNN.svg?branch=master)
 
-This is code for training and evaluating a Convolutional Neural Network for
-board evaluation in Go. This is an ongoing project and I will be adding to it
-in the coming weeks. In this project we use CNN to predict the final state of the board. This is possible due to the nature of the game Go, because pieces do not move during the game, early and midgame board positions are highly predictive of the final ownership. The model exhibited here would likely perform poorly, but it is still interesting to see what it learned and I hope this work will inspire future projects.
+This is code for training and evaluating a Convolutional Neural Network (CNN) for board evaluation in Go. This is an ongoing project and I will be adding to it in the coming weeks. In this project we use CNN to predict the final state of the board. This is possible due to the nature of the game Go, because pieces do not move during the game, early and midgame board positions are highly predictive of the final ownership. The model exhibited here would likely perform poorly, but it is still interesting to see what it learned and I hope this work will inspire future projects. 
 
 ## Current Model
 
 ### Feature Planes
 
 The inputs to the model are 8 feature planes containing information about the
-current state of the board. 
+current state of the board.   
 ```
-0: our stones with 1 liberty
-1: our stones with 2 liberty
-2: our stones with 3 or more liberties
-3: their stones with 1 liberty
-4: their stones with 2 liberty
-5: their stones with 3 or more liberty
-6: simple ko
-7: color to move, 1 for black and 0 for white
+    0: our stones with 1 liberty
+    1: our stones with 2 liberty
+    2: our stones with 3 or more liberties
+    3: their stones with 1 liberty
+    4: their stones with 2 liberty
+    5: their stones with 3 or more liberty
+    6: simple ko
+    7: color to move, 1 for black and 0 for white  
 ```
-The target is a 19x19 binary matrix, where 1 indicates the player to move owns the location as either territory or has a stone on the location at the end of the game, 0 indicates the other player. In seki situations we consider both groups alive, and randomly assign spaces in between stones. We use GNU-Go to remove dead stones from the board and determine final ownership. Training only on games not ending in resignation are likely to **introduce unwanted biases** to the model (e.g. large groups are more likely to live and all games are close), future work should address this issue.
+The target is a 19x19 binary matrix, where 1 indicates the player to move owns the location as either territory or has a stone on the location at the end of the game, 0 indicates the other player. In seki situations we consider both groups alive, and randomly assign spaces in between stones. We use GNU-Go to remove dead stones from the board and determine final ownership. **Training only on games not ending in resignation are likely to introduce unwanted biases** to the model (e.g. large groups are more likely to live and all games are close), future work should address this issue.
 
 ### NN Architecture
 
@@ -30,14 +28,15 @@ So far I have only tried a single architecture; namely a 5-layer 64-filter CNN. 
 
 ### Output
 
-The output of the model is a vector of 361 probabilities, one for each space in
-the board, and is the probability that the player to move will occupy that space at the end of the game. We use a sigmoid activation for the output layer and minimize the sum of squares loss between the predicted probabilities and the actual binary target. 
+The output of the model is a vector of 81 or 361 probabilities (depend on the board size), one for each space in the board, and is the probability that the player to move will occupy that space at the end of the game. We use a sigmoid activation for the output layer and minimize the sum of squares loss between the predicted probabilities and the actual binary target. 
 
 ### Optimizer
 
-We use an ADAM optimizer with learning rate 10e-4.
+We use an default ADAM optimizer with learning rate 10e-4.
 
 ## Training Pipeline
+
+Here is an example training pipeline for 9x9 Go.
 
 1. Create a separate environment for GoCNN (optional)
     ```
@@ -93,7 +92,7 @@ We use an ADAM optimizer with learning rate 10e-4.
     python main.py train
     ```
 
-8. After the training finished, you can check out your training result by running the program in GTP mode and play with it interactively through [GoGui](https://sourceforge.net/projects/gogui/):
+8. After the training finished, you can check out your training result by running the program in GTP mode and play with it interactively via [GoGui](https://sourceforge.net/projects/gogui/):
     ```
     python main.py gtp
     ```
