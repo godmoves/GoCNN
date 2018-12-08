@@ -60,16 +60,21 @@ def print_info(feature_cube=None, y_pred=None, y_val=None, y_true=None, board_si
     return error_count
 
 
-def test_accuracy(features, targets, x, ownership, count_correct_op, board_size=19):
+def test_accuracy(features, targets, model):
     # I get a memory error when tf tries to feed the whole test set into my GPU, so we will do it in batches
-    BATCH_SIZE = 100
+    BATCH_SIZE = 128
     NUM_SAMPLES = len(features)
     batch_idx = 0
+
+    x = model.x
+    y_real = model.y_real
+    correct_count_op = model.correct_count
+    board_size = model.board_size
 
     num_correct = 0
     while batch_idx < NUM_SAMPLES:
         x_ = features[batch_idx:batch_idx + BATCH_SIZE]
         y_ = targets[batch_idx:batch_idx + BATCH_SIZE]
-        num_correct += count_correct_op.eval(feed_dict={x: x_, ownership: y_})
+        num_correct += correct_count_op.eval(feed_dict={x: x_, y_real: y_})
         batch_idx += BATCH_SIZE
     return float(num_correct) / float(NUM_SAMPLES * board_size * board_size)

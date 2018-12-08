@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 import unittest
 
-from board_evaluation.go_datafile_reader import RandomAccessFileReader
+from board_evaluation.datafile_reader import RandomAccessFileReader
 from tests.test_configure import *
 
 
