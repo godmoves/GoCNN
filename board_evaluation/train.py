@@ -2,11 +2,11 @@
 import os
 
 import numpy as np
-import tensorflow as tf
 
-from board_evaluation import go_datafile_reader
-from board_evaluation import model
-from board_evaluation import model_eval
+from board_evaluation.cnn_model import CNNModel
+from board_evaluation.model_utils import test_accuracy
+from board_evaluation.datafile_reader import GoDatafileReader
+from board_evaluation.datafile_reader import RandomAccessFileReader
 
 
 def rolling_mean(number_list, window=20):
@@ -37,8 +37,8 @@ def nn_trainer(train_dir, test_dir, ckpt_path, board_size, total_steps=100000):
     # RandomAccessFileReader, you can do this with the command "sudo ulimit -n 20000"
     # if sudo can't find the ulimit command try the following below:
     # sudo sh -c "ulimit -n 20000 && exec su $LOGNAME"
-    reader = go_datafile_reader.RandomAccessFileReader(train_files, board_size)
-    test_reader = go_datafile_reader.GoDatafileReader(test_files, board_size)
+    reader = RandomAccessFileReader(train_files, board_size)
+    test_reader = GoDatafileReader(test_files, board_size)
 
     test_reader.num_epochs = 0
     test_features = []
@@ -48,43 +48,15 @@ def nn_trainer(train_dir, test_dir, ckpt_path, board_size, total_steps=100000):
         test_features.append(feature_cube)
         test_targets.append(final_state)
 
-    x, ownership = model.place_holders(board_size=board_size)
-    y_conv = model.model(x, board_size=board_size)
-    loss = model.loss_function(ownership, y_conv)
-    train_op = model.train_step(loss)
+    # TODO: the layer number is actually fixed now. We want to change it laster
+    # to test the performance of different architectures.
+    model = CNNModel(board_size=9, layer=5, filter=64, ckpt_path=ckpt_path)
 
-    prediction = tf.round(y_conv)
-    correct_prediction = tf.equal(ownership, prediction)
-    correct_count = tf.reduce_sum(tf.cast(correct_prediction, "float"))
-    accuracy = tf.reduce_mean(tf.cast(correct_prediction, "float"))
-
-    sess = tf.InteractiveSession()
-    sess.run(tf.global_variables_initializer())
-    saver = tf.train.Saver(tf.global_variables())
-
-    ckpt_dir, _ = os.path.split(ckpt_path)
-    ckpt = tf.train.latest_checkpoint(ckpt_dir)
-    if ckpt is not None:
-        print("restore from previous checkpoint")
-        saver.restore(sess, ckpt)
-
-    best_test_accuracy = 0
-    for k in range(total_steps):
+    for step in range(total_steps):
         x_batch, y_batch = reader.get_batch(64)
-        _, loss_value, y_value = sess.run([train_op, loss, y_conv], feed_dict={
-                                          x: x_batch, ownership: y_batch})
-        if k % 10 == 0:
-            acc = accuracy.eval(feed_dict={x: x_batch, ownership: y_batch})
-            print("step=%d, loss=%f. acc=%f" % (k, loss_value, acc))
 
-        if k % 1000 == 0:
-            test_accuracy = model_eval.test_accuracy(
-                test_features, test_targets, x, ownership, correct_count, board_size)
-            print("Test accuracy: %f" % test_accuracy)
-            if test_accuracy > best_test_accuracy:
-                print("New best test accuracy, saving checkpoint...")
-                saver.save(sess, ckpt_path)
-                best_test_accuracy = test_accuracy
-            else:
-                print('Test accuracy %s less than %s, no progress...' % (
-                    test_accuracy, best_test_accuracy))
+        model.train(step, x_batch, y_batch)
+
+        if step % 1000 == 0:
+            test_acc = test_accuracy(test_features, test_targets, model)
+            model.save_ckpt(test_acc, only_keep_best=True)
