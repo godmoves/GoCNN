@@ -62,7 +62,7 @@ class CNNModel():
             print("step=%d, loss=%f, acc=%f" % (step, loss_value, acc))
 
     def model(self, x, board_size=19, filters=64):
-        # the layer number here is not configurable, I will fix this laster
+        # the layer number here is not configurable, I will fix this later
         x_board = tf.reshape(x, [-1, board_size, board_size, 8])
         W_conv1 = weight_variable([5, 5, 8, filters])
         b_conv1 = bias_variable([filters])
@@ -107,6 +107,7 @@ class CNNModel():
             self.saver.restore(self.sess, ckpt)
 
     def save_ckpt(self, test_accuracy, only_keep_best=True):
+        # by default, we only keep the net with best test accuracy
         print("Test accuracy: %f" % test_accuracy)
         if only_keep_best:
             if test_accuracy > self.best_test_accuracy:

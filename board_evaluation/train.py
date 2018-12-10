@@ -48,7 +48,7 @@ def nn_trainer(train_dir, test_dir, ckpt_path, board_size, total_steps=100000):
         test_features.append(feature_cube)
         test_targets.append(final_state)
 
-    # TODO: the layer number is actually fixed now. We want to change it laster
+    # TODO: the layer number is actually fixed now. We want to change it later
     # to test the performance of different architectures.
     model = CNNModel(board_size=9, layers=5, filters=64, ckpt_path=ckpt_path)
 
