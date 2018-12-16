@@ -9,3 +9,9 @@ jobs:
       - run: pip install tensorflow
       - run: ./thirdparty/build_gnugo.sh
       - run: pytest
+
+workflows:
+  version: 2
+  pytest:
+    jobs:
+      - pytest
