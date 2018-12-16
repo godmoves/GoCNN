@@ -7,4 +7,5 @@ jobs:
       - checkout
       - run: pip install -r requirements.txt
       - run: pip install tensorflow
-      - run: ./thirdparty/build_gnugo.sh && pytest
+      - run: ./thirdparty/build_gnugo.sh
+      - run: pytest
