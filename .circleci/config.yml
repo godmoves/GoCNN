@@ -1,0 +1,17 @@
+version: 2
+jobs:
+  pytest:
+    docker:
+      - image: circleci/python:2.7.13
+    steps:
+      - checkout
+      - run: sudo pip install -r requirements.txt
+      - run: sudo pip install tensorflow
+      - run: ./thirdparty/build_gnugo.sh
+      - run: python -m unittest discover
+
+workflows:
+  version: 2
+  pytest:
+    jobs:
+      - pytest
