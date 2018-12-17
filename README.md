@@ -1,6 +1,6 @@
 # Using CNN for Go board evaluation with tensorflow
 
-![travisci](https://travis-ci.com/godmoves/GoCNN.svg?branch=master)
+![travisci](https://travis-ci.com/godmoves/GoCNN.svg?branch=master) [![CircleCI](https://circleci.com/bb/mankitpong/gocnn.svg?style=svg&circle-token=22c0a613acff4bbf5b3ca58c980a105ad724ebc3)](https://circleci.com/bb/mankitpong/gocnn)
 
 This is code for training and evaluating a Convolutional Neural Network (CNN) for board evaluation in Go. This is an ongoing project and I will be adding to it in the coming weeks. In this project we use CNN to predict the final state of the board. This is possible due to the nature of the game Go, because pieces do not move during the game, early and midgame board positions are highly predictive of the final ownership. The model exhibited here would likely perform poorly, but it is still interesting to see what it learned and I hope this work will inspire future projects. 
 
