@@ -26,9 +26,9 @@ def mode_preprocess(parser):
     parser.add_argument('-c', '--completed_dir', dest='completed_dir', default='./data/gnugo',
                         help='directory to save gnugo completed sgf files (with ownership info)')
     parser.add_argument('-b', '--board_size', dest='board_size', type=int,
-                        default=9, help='board size')
+                        default=9, help='board size, default is 9')
     parser.add_argument('--no_ownership', dest='ownership', default=True,
-                        action='store_false', help='do not count ownership')
+                        action='store_false', help='do not count ownership, default is True')
 
     args = parser.parse_args()
     params = vars(args)
@@ -50,11 +50,11 @@ def mode_train(parser):
     parser.add_argument('--test_dir', dest='test_dir', type=str,
                         default='./data/input/test', help='directory contains test data')
     parser.add_argument('-b', '--board_size', dest='board_size', type=int,
-                        default=9, help='board size')
+                        default=9, help='board size, default is 9')
     parser.add_argument('--ckpt_path', dest='ckpt_path', type=str,
                         default='./data/working/cnn_5layer_64filter', help='path to check point')
     parser.add_argument('--steps', dest='steps', type=int,
-                        default=100000, help='total training steps')
+                        default=100000, help='total training steps, default is 1e5')
 
     args = parser.parse_args()
     params = vars(args)
@@ -75,7 +75,7 @@ def mode_gtp(parser):
                         default='./data/working/cnn_5layer_64filter',
                         help='path to tensorflow model')
     parser.add_argument('-b', '--board_size', dest='board_size', type=int,
-                        default=9, help='board size')
+                        default=9, help='board size, default is 9')
     args = parser.parse_args()
     params = vars(args)
 
