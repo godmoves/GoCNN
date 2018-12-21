@@ -27,7 +27,7 @@ def read_data_from_dir(data_dir):
     return data_files
 
 
-def nn_trainer(train_dir, test_dir, ckpt_path, board_size, total_steps=100000):
+def nn_trainer(train_dir, test_dir, ckpt_dir, board_size, total_steps=100000):
     train_files = read_data_from_dir(train_dir)
     test_files = read_data_from_dir(test_dir)
 
@@ -48,9 +48,8 @@ def nn_trainer(train_dir, test_dir, ckpt_path, board_size, total_steps=100000):
         test_features.append(feature_cube)
         test_targets.append(final_state)
 
-    # TODO: the layer number is actually fixed now. We want to change it later
-    # to test the performance of different architectures.
-    model = CNNModel(board_size=9, layers=5, filters=64, ckpt_path=ckpt_path)
+    # TODO: maybe we can handle the NN structure in a better way
+    model = CNNModel(board_size=9, layers=7, filters=64, ckpt_dir=ckpt_dir)
 
     for step in range(total_steps):
         x_batch, y_batch = reader.get_batch(64)
@@ -59,4 +58,4 @@ def nn_trainer(train_dir, test_dir, ckpt_path, board_size, total_steps=100000):
 
         if step % 1000 == 0:
             test_acc = test_accuracy(test_features, test_targets, model)
-            model.save_ckpt(test_acc, only_keep_best=True)
+            model.save_ckpt(test_acc, keep_best_only=True)

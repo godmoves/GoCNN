@@ -1,5 +1,7 @@
 #!/usr/bin/env python2
+from __future__ import print_function
 import os
+import sys
 
 import tensorflow as tf
 
@@ -25,15 +27,15 @@ def place_holders(board_size=19):
 
 
 class CNNModel():
-    def __init__(self, board_size, layers, filters, ckpt_path):
+    def __init__(self, board_size, layers, filters, ckpt_dir):
         self.board_size = board_size
         self.layers = layers
         self.filters = filters
         self.sess = tf.InteractiveSession()
 
         # training op
-        self.x, self.y_real = place_holders(board_size=board_size)
-        self.y_conv = self.model(self.x, board_size=board_size, filters=filters)
+        self.x, self.y_real = place_holders(self.board_size)
+        self.y_conv = self.model(self.x)
         self.loss = self.loss_function(self.y_real, self.y_conv)
         self.train_op = self.train_step(self.loss)
 
@@ -47,10 +49,13 @@ class CNNModel():
         self.sess.run(tf.global_variables_initializer())
 
         # save & restore configuration
-        self.saver = tf.train.Saver(tf.global_variables())
-        self.ckpt_path = ckpt_path
-        self.restore_ckpt()
         self.best_test_accuracy = 0
+        self.saver = tf.train.Saver(tf.global_variables())
+        if ckpt_dir is not None:
+            self.ckpt_dir = ckpt_dir
+            self.ckpt_name = 'cnn_{}layer_{}filter'.format(self.layers, self.filters)
+            self.ckpt_path = os.path.join(self.ckpt_dir, self.ckpt_name)
+            self.restore_ckpt()
 
     def train(self, step, x_batch, y_batch):
         _, loss_value, y_value = self.sess.run(
@@ -61,35 +66,28 @@ class CNNModel():
             acc = self.accuracy.eval(feed_dict={self.x: x_batch, self.y_real: y_batch})
             print("step=%d, loss=%f, acc=%f" % (step, loss_value, acc))
 
-    def model(self, x, board_size=19, filters=64):
-        # the layer number here is not configurable, I will fix this later
-        x_board = tf.reshape(x, [-1, board_size, board_size, 8])
-        W_conv1 = weight_variable([5, 5, 8, filters])
-        b_conv1 = bias_variable([filters])
-        h_conv1 = tf.nn.relu(conv2d(x_board, W_conv1) + b_conv1)
+    def conv_layer(self, x, filters, name='conv'):
+        with tf.name_scope(name):
+            W = weight_variable([5, 5, filters, filters])
+            b = bias_variable([filters])
+            h = tf.nn.relu(conv2d(x, W) + b)
+        return h
 
-        W_conv2 = weight_variable([5, 5, filters, filters])
-        b_conv2 = bias_variable([filters])
-        h_conv2 = tf.nn.relu(conv2d(h_conv1, W_conv2) + b_conv2)
+    def model(self, x):
+        x_board = tf.reshape(x, [-1, self.board_size, self.board_size, 8])
+        W_conv_first = weight_variable([5, 5, 8, self.filters])
+        b_conv_first = bias_variable([self.filters])
+        x = tf.nn.relu(conv2d(x_board, W_conv_first) + b_conv_first)
 
-        W_conv3 = weight_variable([5, 5, filters, filters])
-        b_conv3 = bias_variable([filters])
-        h_conv3 = tf.nn.relu(conv2d(h_conv2, W_conv3) + b_conv3)
+        for i in range(self.layers - 1):
+            x = self.conv_layer(x, self.filters, name='conv_' + str(i))
 
-        W_conv4 = weight_variable([5, 5, filters, filters])
-        b_conv4 = bias_variable([filters])
-        h_conv4 = tf.nn.relu(conv2d(h_conv3, W_conv4) + b_conv4)
+        # outputs from final layer
+        W_conv_final = weight_variable([5, 5, self.filters, 1])
+        b_conv_final = bias_variable([1])
+        h_conv_final = conv2d(x, W_conv_final) + b_conv_final
 
-        W_conv5 = weight_variable([5, 5, filters, filters])
-        b_conv5 = bias_variable([filters])
-        h_conv5 = tf.nn.relu(conv2d(h_conv4, W_conv5) + b_conv5)
-
-        # Final outputs from layer 5
-        W_convm5 = weight_variable([5, 5, filters, 1])
-        b_convm5 = bias_variable([1])
-        h_convm5 = conv2d(h_conv5, W_convm5) + b_convm5
-
-        pred_ownership = tf.sigmoid(tf.reshape(h_convm5, [-1, board_size**2]))
+        pred_ownership = tf.sigmoid(tf.reshape(h_conv_final, [-1, self.board_size**2]))
         return pred_ownership
 
     def loss_function(self, y_pred, y_true):
@@ -100,16 +98,15 @@ class CNNModel():
         return tf.train.AdamOptimizer(1e-4).minimize(loss)
 
     def restore_ckpt(self):
-        ckpt_dir, _ = os.path.split(self.ckpt_path)
-        ckpt = tf.train.latest_checkpoint(ckpt_dir)
+        ckpt = tf.train.latest_checkpoint(self.ckpt_dir)
         if ckpt is not None:
-            print("restore from previous checkpoint")
+            print("restore from previous checkpoint", file=sys.stderr)
             self.saver.restore(self.sess, ckpt)
 
-    def save_ckpt(self, test_accuracy, only_keep_best=True):
+    def save_ckpt(self, test_accuracy, keep_best_only=True):
         # by default, we only keep the net with best test accuracy
         print("Test accuracy: %f" % test_accuracy)
-        if only_keep_best:
+        if keep_best_only:
             if test_accuracy > self.best_test_accuracy:
                 print("New best test accuracy, saving checkpoint...")
                 self.saver.save(self.sess, self.ckpt_path)
