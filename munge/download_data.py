@@ -1,6 +1,7 @@
 #!/usr/bin/env python2
 import os
 
+
 URL_BASE = "http://www.yss-aya.com/cgos/9x9/archives/9x9_%d_%02d.tar.bz2"
 
 
