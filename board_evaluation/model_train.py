@@ -36,7 +36,7 @@ def nn_trainer(train_dir, test_dir, ckpt_dir, board_size, total_steps=100000):
     # note you may have to change the os limit for number of open files to use the
     # RandomAccessFileReader, you can do this with the command "sudo ulimit -n 20000"
     # if sudo can't find the ulimit command try the following below:
-    # sudo sh -c "ulimit -n 20000 && exec su $LOGNAME"
+    #   sudo sh -c "ulimit -n 20000 && exec su $LOGNAME"
     reader = RandomAccessFileReader(train_files, board_size)
     test_reader = GoDatafileReader(test_files, board_size)
 

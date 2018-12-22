@@ -1,6 +1,4 @@
 #!/usr/bin/env python2
-
-# GoDriver.py
 import numpy as np
 
 from thirdparty.go_board import GoBoard

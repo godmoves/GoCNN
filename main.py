@@ -1,12 +1,12 @@
 #!/usr/bin/env python2
-import argparse
 import sys
 import json
+import argparse
 
-from munge.data_preprocessor import munge_all_sgfs
-from board_evaluation.model_train import nn_trainer
 from visualization.gtp import gtp_io
-from data.download_data import download_cgos_data
+from munge.data_preprocessor import munge_all_sgfs
+from munge.download_data import download_cgos_data
+from board_evaluation.model_train import nn_trainer
 
 
 def mode_download(parser):

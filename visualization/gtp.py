@@ -1,12 +1,11 @@
 #!/usr/bin/env python2
 
-'''
-This file contains the main loop which communicates to gogui via the Go Text Protocol (gtp) via stdin.
-When the predict ownership method is called we return the models board evaluation prediction on the
-current state of the board.
-'''
+# This file contains the main loop which communicates to gogui via the Go Text
+# Protocol (gtp) via stdin. When the predict ownership method is called we return
+# the models board evaluation prediction on the current state of the board.
 
 from __future__ import print_function
+
 import sys
 import re
 
@@ -29,23 +28,28 @@ def str_to_coord(move):
     return (row, col)
 
 
-# ownership_matrix - [board_size, board_size] matrix of floats output from the CNN model
-# Formats a valid response string that can be fed into gogui as response to the
-# 'predict_ownership' command
 def influence_str(ownership_matrix):
-    score = np.sum(2 * ownership_matrix - 1) - 7
-    print("Score (komi=7): %.2f" % score, file=sys.stderr)
+    """
+        Formats a valid response string that can be fed into gogui as response
+        to the 'predict_ownership' command
+        ownership_matrix - [board_size, board_size] matrix of floats output from
+                           the CNN model
+    """
+    score = np.sum(2.0 * ownership_matrix - 1.0) - 7.5
+    print("Score (komi=7.5): %.2f" % score, file=sys.stderr)
     rtn_str = "INFLUENCE "
     for i in range(len(ownership_matrix)):
         for j in range(len(ownership_matrix)):
             # convert to [-1,1] scale
-            rtn_str += "%s %.1lf " % (coord_to_str(i, j), 2 * (ownership_matrix[i][j] - .5))
-            # rtn_str+= " %.1lf\n" %(ownership_matrix[i][j])
+            value = 2.0 * ownership_matrix[i][j] - 1.0
+            rtn_str += "%s %.1lf " % (coord_to_str(i, j), value)
     return rtn_str
 
 
 def gtp_io(model_path, board_size):
-    """ Main loop which communicates to gogui via GTP"""
+    """
+        Main loop which communicates to gogui via GTP
+    """
     known_commands = ['boardsize', 'clear_board', 'komi', 'play', 'list_commands',
                       'final_score', 'quit', 'name', 'version', 'known_command',
                       'protocol_version', 'gogui-analyze_commands']
@@ -106,11 +110,11 @@ def gtp_io(model_path, board_size):
             print('=%s \n\n' % (cmdid,), end='')
             break
         else:
-            print('Warning: Ignoring unknown command - %s' % (line,), file=sys.stderr)
+            print('Warning: Ignoring unknown command - %s' % line, file=sys.stderr)
             ret = None
 
         if ret is not None:
-            print('=%s %s\n\n' % (cmdid, ret,), end='')
+            print('=%s %s\n\n' % (cmdid, ret), end='')
         else:
-            print('?%s ???\n\n' % (cmdid,), end='')
+            print('?%s ???\n\n' % cmdid, end='')
         sys.stdout.flush()

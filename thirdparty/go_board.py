@@ -11,8 +11,8 @@ import numpy as np
 from thirdparty.go_string import GoString
 
 
-# a go board, can apply moves to it, contains gostrings, including their pieces, liberties etc
-# can check for simple ko, and handle captures
+# a go board, can apply moves to it, contains gostrings, including their pieces,
+# liberties etc, can check for simple ko, and handle captures
 def _fill(board, i, j, fill_val):
     if i < 0 or j < 0 or i >= len(board) or j >= len(board):
         return
@@ -34,7 +34,7 @@ class GoBoard(object):
         self.goStrings = {}  # map of pos to gostring
 
     def foldStrings(self, targetString, sourceString, joinPos):
-        if(targetString == sourceString):
+        if targetString == sourceString:
             return
 
         for piecePos in sourceString.pieces.pieces:
@@ -45,9 +45,18 @@ class GoBoard(object):
         targetString.copyLibertiesFrom(sourceString)
         targetString.removeLiberty(joinPos)
 
+    def neighbors(self, row, col):
+        return [(row - 1, col), (row + 1, col),
+                (row, col - 1), (row, col + 1)]
+
+    def outboard(self, pos):
+        row, col = pos
+        outrow = row < 0 or row >= self.boardSize
+        outcol = col < 0 or col >= self.boardSize
+        return (outrow or outcol)
+
     def addAdjacentLibertyString(self, pointString, pos):
-        (row, col) = pos
-        if row < 0 or col < 0 or row >= self.boardSize or col >= self.boardSize:
+        if self.outboard(pos):
             return
         if pos not in self.board:
             pointString.addLiberty(pos)
@@ -60,7 +69,7 @@ class GoBoard(object):
         self.board[pos] = color
 
         (row, col) = pos
-        for adjpos in [(row - 1, col), (row + 1, col), (row, col - 1), (row, col + 1)]:
+        for adjpos in self.neighbors(row, col):
             self.addAdjacentLiberty(adjpos, pointString)
 
         return pointString
@@ -79,42 +88,40 @@ class GoBoard(object):
             # is the last move adjacent to us, and do we capture it?
             (lastMoveRow, lastMoveCol) = self.ko_lastMove
             manhattanDistanceLastMove = abs(lastMoveRow - row) + abs(lastMoveCol - col)
-            if(manhattanDistanceLastMove == 1):
+            if manhattanDistanceLastMove == 1:
                 lastGoString = self.goStrings.get((lastMoveRow, lastMoveCol))
-                if(lastGoString is not None and lastGoString.numLiberties() == 1):
+                if lastGoString is not None and lastGoString.numLiberties() == 1:
                     # apparently we do ....
-                    # how many stones would we capture?  means, do we capture any others, that are
-                    # not the same string?
+                    # how many stones would we capture?  means, do we capture
+                    # any others, that are not the same string?
                     # first, check if this string has only one stone...
-                    if(lastGoString.numPieces() == 1):
+                    if lastGoString.numPieces() == 1:
                         # apparently it does....
                         # any other adjacent enemy with no liberties?
                         totalNoLibertyAdjacentEnemy = 0
-                        for adjpos in [(row - 1, col), (row + 1, col), (row, col - 1), (row, col + 1)]:
-                            if(self.board.get(adjpos) == enemyColor and
+                        for adjpos in self.neighbors(row, col):
+                            if (self.board.get(adjpos) == enemyColor and
                                     self.goStrings[adjpos].numLiberties() == 1):
-                                totalNoLibertyAdjacentEnemy = totalNoLibertyAdjacentEnemy + 1
-                        if(totalNoLibertyAdjacentEnemy == 1):
+                                totalNoLibertyAdjacentEnemy += 1
+                        if totalNoLibertyAdjacentEnemy == 1:
                             # it's a ko...
                             return True
         return False
 
     def checkEnemyLiberty(self, playColor, enemyPos, ourPos):
-        (enemyrow, enemycol) = enemyPos
-        (ourrow, ourcol) = ourPos
         # if enemyPos not in board
-        if(enemyrow < 0 or enemyrow >= self.boardSize or enemycol < 0 or enemycol >= self.boardSize):
+        if self.outboard(enemyPos):
             return
         enemyColor = self.otherColor(playColor)
         # if enemyPos do not belong to enemy
         if self.board.get(enemyPos) != enemyColor:
             return
         enemyString = self.goStrings[enemyPos]
-        if(enemyString is None):
+        if enemyString is None:
             raise("checkenemyliberty 1 ")
         enemyString.removeLiberty(ourPos)
         # if the liberty of enemy is 0 after we play, then we kill that group
-        if(enemyString.numLiberties() == 0):
+        if enemyString.numLiberties() == 0:
             # killed it!
             # remove all pieces of this string from the board and remove the string
             # ko stuff
@@ -123,8 +130,7 @@ class GoBoard(object):
                 del self.board[enemypos]
                 del self.goStrings[enemypos]
                 self.ko_lastMoveNumCaptured = self.ko_lastMoveNumCaptured + 1
-                for adjstring in [(stringrow - 1, stringcol), (stringrow + 1, stringcol),
-                                  (stringrow, stringcol - 1), (stringrow, stringcol + 1)]:
+                for adjstring in self.neighbors(stringrow, stringcol):
                     self.addLibertyToAdjacentString(adjstring, enemypos, playColor)
 
     def applyMove(self, playColor, pos):
@@ -155,23 +161,21 @@ class GoBoard(object):
         self.ko_lastMove = pos
 
     def addLibertyToAdjacentString(self, stringpos, libertypos, color):
-        if(self.board.get(stringpos) != color):
+        if self.board.get(stringpos) != color:
             return
         goString = self.goStrings[stringpos]
         goString.insertLiberty(libertypos)
 
     def addAdjacentLiberty(self, pos, goString):
-        (row, col) = pos
-        if row < 0 or col < 0 or row > self.boardSize - 1 or col > self.boardSize - 1:
+        if self.outboard(pos):
             return
         if pos not in self.board:
             goString.insertLiberty(pos)
 
     def foldStringIfOurs(self, string2, color, pos, joinpos):
-        (row, col) = pos
-        if(row < 0 or row >= self.boardSize or col < 0 or col >= self.boardSize):
+        if self.outboard(pos):
             return string2
-        if(self.board.get(pos) != color):
+        if self.board.get(pos) != color:
             return string2
         string1 = self.goStrings[pos]
         self.foldStrings(string1, string2, joinpos)

@@ -4,9 +4,12 @@
 def print_info(feature_cube=None, y_pred=None, y_val=None, y_true=None, board_size=19):
     '''
         Visual the outputs of the model.
-        Feature_cube: the x input of model, currently assumes first 6 planes are board position features
-        y_pred:       board_size x board_size matrix of thresholded prediction of final board ownership
-        y_val:        board_size x board_size matrix of probabilities output by model
+        Feature_cube: the x input of model, currently assumes first 6 planes are
+                      board position features
+        y_pred:       board_size x board_size matrix of thresholded prediction
+                      of final board ownership
+        y_val:        board_size x board_size matrix of probabilities output by
+                      model
         y_true:       board_size x board_size matrix of true board ownership
         board_size:   board size
     '''
@@ -15,8 +18,10 @@ def print_info(feature_cube=None, y_pred=None, y_val=None, y_true=None, board_si
         current_row = ""
         if feature_cube is not None:
             for j in range(board_size):
-                b_sum = feature_cube[i][j][0] + feature_cube[i][j][1] + feature_cube[i][j][2]
-                w_sum = feature_cube[i][j][3] + feature_cube[i][j][4] + feature_cube[i][j][5]
+                b_sum = feature_cube[i][j][0] + feature_cube[i][j][1] + \
+                    feature_cube[i][j][2]
+                w_sum = feature_cube[i][j][3] + feature_cube[i][j][4] + \
+                    feature_cube[i][j][5]
                 if b_sum > 0:
                     current_row += '1'
                 elif w_sum > 0:
@@ -61,7 +66,8 @@ def print_info(feature_cube=None, y_pred=None, y_val=None, y_true=None, board_si
 
 
 def test_accuracy(features, targets, model):
-    # I get a memory error when tf tries to feed the whole test set into my GPU, so we will do it in batches
+    # I get a memory error when tf tries to feed the whole test set into my GPU,
+    # so we will do it in batches
     BATCH_SIZE = 128
     NUM_SAMPLES = len(features)
     batch_idx = 0

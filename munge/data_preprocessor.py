@@ -34,7 +34,8 @@ from thirdparty.go_board import GoBoard
 
 
 # this function is related to _board_to_feature_cube in thirdparty/BoardEvaluator
-def addToDataFile(datafile, color, move, goBoard, ownership, black_ownership, white_ownership, board_size):
+def addToDataFile(datafile, color, move, goBoard, ownership, black_ownership,
+                  white_ownership, board_size):
     '''
         datafile is an open binary file we are writing to
         color is the color of the next person to move
@@ -76,7 +77,8 @@ def addToDataFile(datafile, color, move, goBoard, ownership, black_ownership, wh
         flattened_targets = [to_move_ownership[i][j] for i in range(board_size) for j in range(board_size)]
         bit_writer.write_sequence(flattened_targets, datafile)
 
-    # The 8 board feature planes are encoded by sequential bytes, one byte per position on the board
+    # The 8 board feature planes are encoded by sequential bytes, one byte per
+    # position on the board
     for row in range(0, goBoard.boardSize):
         for col in range(0, goBoard.boardSize):
             thisbyte = 0
@@ -162,7 +164,8 @@ def walkthroughSgf(sgf_contents, sgf_file_path, sgf_file_name, output_file_path,
     output_file.close()
 
 
-def munge_sgf(sgf_file_path, sgf_file_name, output_file_path, completed_dir, board_size, ownership):
+def munge_sgf(sgf_file_path, sgf_file_name, output_file_path, completed_dir,
+              board_size, ownership):
     '''
         open the sgf file, read the contents and write them to the binary file output_file_path
 
