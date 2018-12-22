@@ -8,6 +8,7 @@ if [ -e $PACHI ]; then
 else
   wget https://github.com/pasky/pachi/archive/pachi-12.10-jowa.tar.gz
   tar -xzf pachi-12.10-jowa.tar.gz
+  rm pachi-12.10-jowa.tar.gz
   cd pachi-pachi-12.10-jowa
   sed 's/DCNN=1/# DCNN=1/g' Makefile > Makefile.tmp1
   sed 's/.git\/HEAD .git\/index/ /g' Makefile.tmp1 > Makefile.tmp2
