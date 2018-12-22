@@ -116,6 +116,6 @@ to do data munging.
 
 - [ ] Try additional features such as previous moves, turns since move was
 played, color to move next.
-- [ ] Try different size model architectures.
 - [ ] Compare model with existing score evaluation programs.
 - [ ] Optimize the code API and structure.
+- [ ] Use pachi to evaluate the board
