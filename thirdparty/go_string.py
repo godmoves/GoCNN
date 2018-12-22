@@ -6,7 +6,7 @@
 # v. 2.0. If a copy of the MPL was not distributed with this file, You can
 # obtain one at http://mozilla.org/MPL/2.0/.
 
-from thirdparty import Bag2d
+from thirdparty import bag2d
 
 
 # represents a string of contiguous pieces of one color on the board
@@ -15,8 +15,8 @@ class GoString(object):
     def __init__(self, boardSize, color):
         self.boardSize = boardSize
         self.color = color
-        self.liberties = Bag2d.Bag2d(boardSize)
-        self.pieces = Bag2d.Bag2d(boardSize)
+        self.liberties = bag2d.Bag2d(boardSize)
+        self.pieces = bag2d.Bag2d(boardSize)
 
     def getPiece(self, index):
         return self.pieces[index]

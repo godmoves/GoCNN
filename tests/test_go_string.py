@@ -1,6 +1,6 @@
 #!/usr/bin/env python2
 import unittest
-from thirdparty.GoString import GoString
+from thirdparty.go_string import GoString
 
 
 class TestGoString(unittest.TestCase):

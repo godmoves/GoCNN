@@ -2,8 +2,8 @@
 import unittest
 import numpy as np
 
-from thirdparty.GoBoard import GoBoard
-from thirdparty.GoString import GoString
+from thirdparty.go_board import GoBoard
+from thirdparty.go_string import GoString
 
 
 class TestGOBoard(unittest.TestCase):

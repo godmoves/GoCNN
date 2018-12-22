@@ -2,8 +2,9 @@
 
 # BoardEvaluator.py
 import os
-from board_evaluation.cnn_model import CNNModel
 import numpy as np
+
+from board_evaluation.cnn_model import CNNModel
 
 
 # this funtion is related to addToDataFile in munge/data_preprocessor

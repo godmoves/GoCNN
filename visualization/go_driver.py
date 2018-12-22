@@ -3,8 +3,8 @@
 # GoDriver.py
 import numpy as np
 
-from thirdparty import GoBoard  # this is in the thirdparty directory
-from visualization.BoardEvaluator import BoardEvaluator
+from thirdparty.go_board import GoBoard
+from visualization.board_evaluator import BoardEvaluator
 
 
 def _swap_color(color):
@@ -30,7 +30,7 @@ class GoDriver:
         self.color_to_move = "b"
 
     def reset_board(self):
-        self.board = GoBoard.GoBoard(self.board_size)
+        self.board = GoBoard(self.board_size)
         self.color_to_move = "b"
 
     def play(self, color, move):

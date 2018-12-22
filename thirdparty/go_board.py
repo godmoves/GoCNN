@@ -8,7 +8,7 @@
 
 import numpy as np
 
-from thirdparty import GoString
+from thirdparty.go_string import GoString
 
 
 # a go board, can apply moves to it, contains gostrings, including their pieces, liberties etc
@@ -54,7 +54,7 @@ class GoBoard(object):
 
     # dont attempt to merge yet
     def createPointString(self, color, pos):
-        pointString = GoString.GoString(self.boardSize, color)
+        pointString = GoString(self.boardSize, color)
         pointString.insertPiece(pos)
         self.goStrings[pos] = pointString
         self.board[pos] = color

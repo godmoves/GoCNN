@@ -12,7 +12,7 @@ import re
 
 import numpy as np
 
-from GoDriver import GoDriver
+from visualization.go_driver import GoDriver
 
 
 letter_coords = "ABCDEFGHJKLMNOPQRST"

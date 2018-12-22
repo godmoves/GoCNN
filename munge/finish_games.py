@@ -4,16 +4,15 @@
 # (remove dead stones) after removing dead stones we can easily determine final
 # board ownership
 
-import threading
 import re
 import os
+import threading
 from subprocess import PIPE, Popen
 
 import gomill.sgf
-import gomill
 import numpy as np
 
-from thirdparty import GoBoard
+from thirdparty.go_board import GoBoard
 
 
 def finish_sgf(sgf_filepath, dest_file, board_size=19, difference_threshold=6,
@@ -144,7 +143,7 @@ def get_final_ownership(gnu_sgf_outputfile, board_size=19):
         print('boardsize not %d, ignoring' % board_size)
         return
 
-    board = GoBoard.GoBoard(board_size)
+    board = GoBoard(board_size)
     for move in sgf.root.get_setup_stones()[0]:
         board.applyMove("b", move)
     for move in sgf.root.get_setup_stones()[1]:

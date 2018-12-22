@@ -30,7 +30,7 @@ import gomill
 
 from munge import finish_games
 from munge import bit_writer
-from thirdparty import GoBoard
+from thirdparty.go_board import GoBoard
 
 
 # this function is related to _board_to_feature_cube in thirdparty/BoardEvaluator
@@ -118,7 +118,7 @@ def walkthroughSgf(sgf_contents, sgf_file_path, sgf_file_name, output_file_path,
         if sgf.get_size() != board_size:
             print('boardsize not %d, ignoring' % board_size)
             return
-        goBoard = GoBoard.GoBoard(board_size)
+        goBoard = GoBoard(board_size)
         if sgf.get_handicap() is not None and sgf.get_handicap() != 0:
             print('handicap not zero, ignoring (' + str(sgf.get_handicap()) + ')')
             return

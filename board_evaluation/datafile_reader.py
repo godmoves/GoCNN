@@ -1,6 +1,7 @@
 #!/usr/bin/env python2
-import numpy as np
 import random
+
+import numpy as np
 from tqdm import tqdm
 
 

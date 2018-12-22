@@ -4,8 +4,8 @@ import sys
 import json
 
 from munge.data_preprocessor import munge_all_sgfs
-from board_evaluation.train import nn_trainer
-from visualization.GTP import gtp_io
+from board_evaluation.model_train import nn_trainer
+from visualization.gtp import gtp_io
 from data.download_data import download_cgos_data
 
 
