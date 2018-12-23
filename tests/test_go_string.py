@@ -8,3 +8,7 @@ class TestGoString(unittest.TestCase):
         gs = GoString(boardSize=3, color='black')
         combo = (1, 2)
         gs.insertPiece(combo)
+
+
+if __name__ == '__main__':
+    unittest.main()

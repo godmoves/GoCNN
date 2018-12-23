@@ -20,6 +20,7 @@ def download_extract_file(year, month):
         res = os.system("tar -jxf %s -C %s" % (file_name, dir_name))
         os.remove(file_name)
         assert(res == 0)
+    return res
 
 
 def download_cgos_data(save_path):
