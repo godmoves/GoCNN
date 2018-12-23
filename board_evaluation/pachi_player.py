@@ -76,16 +76,16 @@ class Pachi():
                            stdout=PIPE, stderr=PIPE)
 
 
-pachi = Pachi('/home/mankit/Work/go/pachi/pachi')
-readbook = xlrd.open_workbook('test9x9.xlsx')
-sheet = readbook.sheet_by_index(0)
+# pachi = Pachi('/home/mankit/Work/go/pachi/pachi')
+# readbook = xlrd.open_workbook('test9x9.xlsx')
+# sheet = readbook.sheet_by_index(0)
 
-nrows, ncols = sheet.nrows, sheet.ncols
-print('Rows: {} Cols: {}'.format(nrows, ncols))
+# nrows, ncols = sheet.nrows, sheet.ncols
+# print('Rows: {} Cols: {}'.format(nrows, ncols))
 
-for i in range(nrows):
-    sgf_content = str(sheet.cell(i, 3).value)
-    _, score = pachi.get_final_score(sgf_content)
-    print('game {}, score {}'.format(i + 1, score))
-    if i % 50 == 0:
-        pachi.restart()
+# for i in range(nrows):
+#     sgf_content = str(sheet.cell(i, 3).value)
+#     _, score = pachi.get_final_score(sgf_content)
+#     print('game {}, score {}'.format(i + 1, score))
+#     if i % 50 == 0:
+#         pachi.restart()

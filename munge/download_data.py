@@ -24,8 +24,9 @@ def download_extract_file(year, month):
 
 
 def download_cgos_data(save_path):
+    # move to the save_path first
     os.chdir(save_path)
-    print('save data in %s\n' % os.getcwd())
+    print('save cgos 9x9 data in %s\n' % os.getcwd())
     for y in range(2015, 2019):
         for m in range(1, 13):
             download_extract_file(y, m)
