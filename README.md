@@ -1,4 +1,4 @@
-# Using CNN for Go board evaluation with tensorflow
+# Using CNN and TensorFlow for Go board evaluation
 
 ![travisci](https://travis-ci.com/godmoves/GoCNN.svg?branch=master) [![CircleCI](https://circleci.com/bb/mankitpong/gocnn.svg?style=svg&circle-token=22c0a613acff4bbf5b3ca58c980a105ad724ebc3)](https://circleci.com/bb/mankitpong/gocnn)
 
@@ -116,6 +116,6 @@ to do data munging.
 
 - [ ] Try additional features such as previous moves, turns since move was
 played, color to move next.
-- [ ] Try different size model architectures.
 - [ ] Compare model with existing score evaluation programs.
 - [ ] Optimize the code API and structure.
+- [ ] Use pachi to evaluate the board

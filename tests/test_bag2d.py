@@ -1,6 +1,6 @@
 #!/usr/bin/env python2
 import unittest
-from thirdparty.Bag2d import Bag2d
+from thirdparty.bag2d import Bag2d
 
 
 class TestBag2d(unittest.TestCase):

@@ -4,16 +4,15 @@
 # (remove dead stones) after removing dead stones we can easily determine final
 # board ownership
 
-import threading
 import re
 import os
+import threading
 from subprocess import PIPE, Popen
 
 import gomill.sgf
-import gomill
 import numpy as np
 
-from thirdparty import GoBoard
+from thirdparty.go_board import GoBoard
 
 
 def finish_sgf(sgf_filepath, dest_file, board_size=19, difference_threshold=6,
@@ -111,13 +110,16 @@ def parse_sgf_result(sgf_filepath, contents, board_size=19):
 
 
 def run_gungo(gnugo_path, sgf_filepath, dest_file):
-    # we call gnugo with the appropriate flags to finish the game. gnugo will write the results to dest_file
+    # we call gnugo with the appropriate flags to finish the game. gnugo will
+    # write the results to dest_file
     p = Popen([gnugo_path, "-l", sgf_filepath, "--outfile", dest_file,
-               "--score", "aftermath", "--capture-all-dead", "--chinese-rules"], stdout=PIPE)
+               "--score", "aftermath", "--capture-all-dead",
+               "--chinese-rules"], stdout=PIPE)
     timer = threading.Timer(10, p.kill)
     try:
         timer.start()
-        # gnugo will print the final score, we check this with whats written in the sgffile
+        # gnugo will print the final score, we check this with whats written in
+        # the sgffile
         output, err = p.communicate()
     finally:
         timer.cancel()
@@ -144,7 +146,7 @@ def get_final_ownership(gnu_sgf_outputfile, board_size=19):
         print('boardsize not %d, ignoring' % board_size)
         return
 
-    board = GoBoard.GoBoard(board_size)
+    board = GoBoard(board_size)
     for move in sgf.root.get_setup_stones()[0]:
         board.applyMove("b", move)
     for move in sgf.root.get_setup_stones()[1]:
@@ -171,14 +173,17 @@ def get_final_ownership(gnu_sgf_outputfile, board_size=19):
 
 
 def finish_sgf_and_get_ownership(sgf_file_path, sgf_file_name, completed_dir,
-                                 board_size=19, difference_threshold=6, year_lowerbound=0):
+                                 board_size=19, difference_threshold=6,
+                                 year_lowerbound=0):
     dest_file = os.path.join(completed_dir, sgf_file_name) + "c"
 
     # first we check if gnugo has already finished this game, if so we just open
     # the .sfgc file can grab final ownership if we haven't munged already, munge
-    # it now. munging may fail if gnugo believes final score is more the difference_threshold away.
+    # it now. munging may fail if gnugo believes final score is more the
+    # difference_threshold away.
     if not os.path.exists(dest_file):
-        if not(finish_sgf(sgf_file_path, dest_file, board_size, difference_threshold, year_lowerbound)):
+        if not(finish_sgf(sgf_file_path, dest_file, board_size,
+                          difference_threshold, year_lowerbound)):
             return None, None  # failed to finish the game
     else:
         print("gnugo has already finished %s" % dest_file)

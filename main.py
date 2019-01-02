@@ -1,12 +1,12 @@
 #!/usr/bin/env python2
-import argparse
 import sys
 import json
+import argparse
 
+from visualization.gtp import gtp_io
 from munge.data_preprocessor import munge_all_sgfs
-from board_evaluation.train import nn_trainer
-from visualization.GTP import gtp_io
-from data.download_data import download_cgos_data
+from munge.download_data import download_cgos_data
+from board_evaluation.model_train import nn_trainer
 
 
 def mode_download(parser):
@@ -26,9 +26,9 @@ def mode_preprocess(parser):
     parser.add_argument('-c', '--completed_dir', dest='completed_dir', default='./data/gnugo',
                         help='directory to save gnugo completed sgf files (with ownership info)')
     parser.add_argument('-b', '--board_size', dest='board_size', type=int,
-                        default=9, help='board size')
+                        default=9, help='board size, default is 9')
     parser.add_argument('--no_ownership', dest='ownership', default=True,
-                        action='store_false', help='do not count ownership')
+                        action='store_false', help='do not count ownership, default is True')
 
     args = parser.parse_args()
     params = vars(args)
@@ -50,11 +50,11 @@ def mode_train(parser):
     parser.add_argument('--test_dir', dest='test_dir', type=str,
                         default='./data/input/test', help='directory contains test data')
     parser.add_argument('-b', '--board_size', dest='board_size', type=int,
-                        default=9, help='board size')
-    parser.add_argument('--ckpt_path', dest='ckpt_path', type=str,
-                        default='./data/working/cnn_5layer_64filter', help='path to check point')
-    parser.add_argument('--steps', dest='steps', type=int,
-                        default=100000, help='total training steps')
+                        default=9, help='board size, default is 9')
+    parser.add_argument('--ckpt_dir', dest='ckpt_dir', type=str,
+                        default='./data/working/', help='directory to save check point')
+    parser.add_argument('--train_steps', dest='train_steps', type=int,
+                        default=100000, help='total training steps, default is 1e5')
 
     args = parser.parse_args()
     params = vars(args)
@@ -62,20 +62,20 @@ def mode_train(parser):
 
     train_dir = params['train_dir']
     test_dir = params['test_dir']
-    ckpt_path = params['ckpt_path']
+    ckpt_dir = params['ckpt_dir']
     board_size = params["board_size"]
-    steps = params['steps']
+    train_steps = params['train_steps']
 
-    nn_trainer(train_dir, test_dir, ckpt_path, board_size, total_steps=steps)
+    nn_trainer(train_dir, test_dir, ckpt_dir, board_size, total_steps=train_steps)
 
 
 def mode_gtp(parser):
     parser.add_argument('gtp', help='gtp mode')
     parser.add_argument('--model_path', dest='model_path', type=str,
-                        default='./data/working/cnn_5layer_64filter',
+                        default='./data/working/cnn_7layer_64filter',
                         help='path to tensorflow model')
     parser.add_argument('-b', '--board_size', dest='board_size', type=int,
-                        default=9, help='board size')
+                        default=9, help='board size, default is 9')
     args = parser.parse_args()
     params = vars(args)
 

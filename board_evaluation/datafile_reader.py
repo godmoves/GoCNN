@@ -1,6 +1,7 @@
 #!/usr/bin/env python2
-import numpy as np
 import random
+
+import numpy as np
 from tqdm import tqdm
 
 
@@ -46,7 +47,8 @@ class RandomAccessFileReader:
         self.samples_read = 0
 
         self.open_files = []
-        print("Initializing pointers in %d datafiles, this may take a few minutes" % len(self.datafiles))
+        print("Initializing pointers in %d datafiles, "
+              "this may take a few minutes" % len(self.datafiles))
         for f in tqdm(self.datafiles):
             file_obj = open(f, "rb")
             self._seek_random_place_in_file(file_obj, board_size)
@@ -56,7 +58,8 @@ class RandomAccessFileReader:
         for f in self.open_files:
             f.close()
 
-    # use resevoir sampling to pick a uniform random sample from the file of unknown number of samples
+    # use resevoir sampling to pick a uniform random sample from the file of
+    # unknown number of samples
     @staticmethod
     def _seek_random_place_in_file(file_obj, board_size=19):
         num_bytes_in_sample = 2 + 1 + 1 + (board_size ** 2 / 8) + 1 + board_size ** 2
@@ -74,8 +77,9 @@ class RandomAccessFileReader:
             count += 1
         file_obj.seek(file_pos, 0)
 
-    # read the next feature cube from the binary file. Note this will increment the position in the file.
-    # This function assumes the bytes 'GO' and the target bytes have already been read
+    # read the next feature cube from the binary file. Note this will increment
+    # the position in the file. This function assumes the bytes 'GO' and the
+    # target bytes have already been read
     def _get_feature_cube(self, file_obj):
         feature_cube = np.zeros((self.board_size, self.board_size, 8))
         for i in range(self.board_size):
@@ -83,7 +87,6 @@ class RandomAccessFileReader:
                 feature_byte = ord(file_obj.read(1))
                 for k in range(8):
                     feature_cube[i][j][k] = ((feature_byte >> k) & 1)
-                # assert(((feature_byte >> 7) & 1) == 1)
         return feature_cube
 
     def read_sample_from_random_file(self):
@@ -133,8 +136,9 @@ class GoDatafileReader:
         self.current_file = open(self.datafiles[self.index_of_file], "rb")
         self.move_index = 0
 
-    # read the next feature cube from the binary file. Note this will increment the position in the file.
-    # This function assumes the bytes 'GO' and the target bytes have already been read
+    # read the next feature cube from the binary file. Note this will increment
+    # the position in the file. This function assumes the bytes 'GO' and the
+    # target bytes have already been read
     def _get_feature_cube(self):
         feature_cube = np.zeros((self.board_size, self.board_size, 8))
         for i in range(self.board_size):
@@ -142,7 +146,6 @@ class GoDatafileReader:
                 feature_byte = ord(self.current_file.read(1))
                 for k in range(8):
                     feature_cube[i][j][k] = ((feature_byte >> k) & 1)
-                # assert(((feature_byte >> 7) & 1) == 1)
         return feature_cube
 
     def read_sample(self):
@@ -192,7 +195,9 @@ class BatchAggregator:
             print("Got to end of mega batch, reinitializing...")
             print("Epoch = %d" % self.go_file_reader.num_epochs)
             self.init_mega_batch()
-        x_list = self.mega_batch_x[self.index_in_mega_batch:self.index_in_mega_batch + batch_size]
-        y_list = self.mega_batch_y[self.index_in_mega_batch:self.index_in_mega_batch + batch_size]
+        x_list = self.mega_batch_x[
+            self.index_in_mega_batch: self.index_in_mega_batch + batch_size]
+        y_list = self.mega_batch_y[
+            self.index_in_mega_batch: self.index_in_mega_batch + batch_size]
         self.index_in_mega_batch += batch_size
         return x_list, y_list

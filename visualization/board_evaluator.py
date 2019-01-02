@@ -1,9 +1,8 @@
 #!/usr/bin/env python2
-
-# BoardEvaluator.py
-import tensorflow as tf
-from board_evaluation import model
+import os
 import numpy as np
+
+from board_evaluation.cnn_model import CNNModel
 
 
 # this funtion is related to addToDataFile in munge/data_preprocessor
@@ -40,22 +39,21 @@ class BoardEvaluator:
     def __init__(self, tf_ckpt_path, board_size):
         # init the tensorflow model
         self.board_size = board_size
-        self.x, _ = model.place_holders(board_size)
-        self.y_conv = model.model(self.x, board_size)
-        self.sess = tf.InteractiveSession()
-        self.sess.run(tf.global_variables_initializer())
-        saver = tf.train.Saver(tf.global_variables())
-        saver.restore(self.sess, tf_ckpt_path)
+        self.ckpt_dir, _ = os.path.split(tf_ckpt_path)
+        # TODO: here we need to specify the architecture of the CNN, this is not
+        # what we want.
+        self.model = CNNModel(board_size, layers=7, filters=64, ckpt_dir=self.ckpt_dir)
 
     # feature_cube - [board_size**2, 8] matrix of floats
     # returns - [board_size, board_size] matrix of probabilities
     def predict_single_sample(self, feature_cube):
-        y_pred = self.sess.run(self.y_conv, feed_dict={self.x: [feature_cube]})
+        y_pred = self.model.sess.run(self.model.y_conv,
+                                     feed_dict={self.model.x: [feature_cube]})
         return np.reshape(y_pred, [self.board_size, self.board_size])
 
     # board - GoBoard object
-    # returns [board_size, board_size] matrix of floats, each float in [0,1] indicating
-    # probability black owns the territory at the end of the game
+    # returns [board_size, board_size] matrix of floats, each float in [0,1]
+    # indicating probability black owns the territory at the end of the game
     def evaluate_board(self, goBoard, color_to_move):
         feature_cube = _board_to_feature_cube(goBoard, color_to_move, self.board_size)
         predicted_ownership = self.predict_single_sample(feature_cube)

@@ -30,8 +30,9 @@ class TestFinishSgf(unittest.TestCase):
         sgf_filepath = os.path.join(input_dir, sgf_name)
         dest_file = os.path.join(completed_dir + sgf_name[:-4]) + ".sgfc"
 
-        res = finish_sgf(sgf_filepath, dest_file, board_size, difference_threshold=100,
-                         year_lowerbound=0, gnugo_timeout=10)
+        res = finish_sgf(sgf_filepath, dest_file, board_size,
+                         difference_threshold=100, year_lowerbound=0,
+                         gnugo_timeout=10)
         self.assertTrue(res)
 
 
