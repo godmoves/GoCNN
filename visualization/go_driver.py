@@ -34,7 +34,8 @@ class GoDriver:
     def play(self, color, move):
         if move != 'pass':
             (row, col) = move
-            self.board.applyMove(color, (row, col))
+            # here we use little letters to represent color
+            self.board.applyMove(color.lower(), (row, col))
         self.color_to_move = _swap_color(color)
 
     # returns [19,19] matrix of floats indicating the probability black will own

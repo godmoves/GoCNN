@@ -1,25 +1,20 @@
 #!/usr/bin/env python2
 # -*- coding: utf-8 -*-
-import xlrd
+from subprocess import Popen, PIPE
+
 import gomill
 import gomill.sgf
 import gomill.common
-from subprocess import Popen, PIPE
-import sys
-
-
-# we need to set the default coding to utf-8 to read Chinese characters
-reload(sys)
-sys.setdefaultencoding('utf-8')
 
 
 class Pachi():
     def __init__(self, pachi_path):
         self.pachi_path = pachi_path
+        self.count = 0
         self.pachi = Popen([self.pachi_path], shell=True, stdin=PIPE,
                            stdout=PIPE, stderr=PIPE)
 
-    def get_pachi_cmd(self, sgf_content):
+    def build_pachi_cmd(self, sgf_content):
         try:
             sgf = gomill.sgf.Sgf_game.from_string(sgf_content)
         except ValueError:
@@ -28,6 +23,7 @@ class Pachi():
         sgf_iterator = sgf.main_sequence_iter()
         pachi_cmd = 'boardsize 9\n'
         pachi_cmd += 'clear_board\n'
+        # default komi is 7.5
         pachi_cmd += 'komi 7.5\n'
         while True:
             try:
@@ -54,7 +50,13 @@ class Pachi():
         return sign * abs_score
 
     def get_final_score(self, sgf_content):
-        pachi_cmd = self.get_pachi_cmd(sgf_content)
+        # restart pachi after 50 evaluations, this can avoid pachi get stuck
+        if (self.count >= 40):
+            self.restart()
+            self.count = 0
+        else:
+            self.count += 1
+        pachi_cmd = self.build_pachi_cmd(sgf_content)
         self.pachi.stdin.write(pachi_cmd)
         self.pachi.stdin.flush()
         influence, score = None, None
@@ -70,22 +72,12 @@ class Pachi():
         score = self.parse_score(score)
         return influence, score
 
+    def get_final_score_matrix(self, sgf_content):
+        influence, score = self.get_final_score(sgf_content)
+        influence_matrix = map(float, influence.split()[2:][1::2])
+        return influence_matrix, score
+
     def restart(self):
         self.pachi.kill()
         self.pachi = Popen([self.pachi_path], shell=True, stdin=PIPE,
                            stdout=PIPE, stderr=PIPE)
-
-
-# pachi = Pachi('/home/mankit/Work/go/pachi/pachi')
-# readbook = xlrd.open_workbook('test9x9.xlsx')
-# sheet = readbook.sheet_by_index(0)
-
-# nrows, ncols = sheet.nrows, sheet.ncols
-# print('Rows: {} Cols: {}'.format(nrows, ncols))
-
-# for i in range(nrows):
-#     sgf_content = str(sheet.cell(i, 3).value)
-#     _, score = pachi.get_final_score(sgf_content)
-#     print('game {}, score {}'.format(i + 1, score))
-#     if i % 50 == 0:
-#         pachi.restart()
