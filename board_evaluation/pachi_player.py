@@ -1,5 +1,6 @@
 #!/usr/bin/env python2
 # -*- coding: utf-8 -*-
+import time
 from subprocess import Popen, PIPE
 
 import gomill
@@ -44,7 +45,7 @@ class Pachi():
 
     def parse_score(self, score):
         if score is None:
-            return score
+            return None
         sign = -1 if 'W' in score else 1
         abs_score = float(score.split('+')[1])
         return sign * abs_score
@@ -61,7 +62,11 @@ class Pachi():
         self.pachi.stdin.flush()
         influence, score = None, None
         # we will wait for result while the command is not blank
+        start = time.time()
         while pachi_cmd is not '':
+            if time.time() - start > 3:
+                print("WARNING: pachi time out, return None")
+                break
             line = self.pachi.stdout.readline().decode('utf-8')
             if 'INFLUENCE' in line:
                 influence = line
@@ -74,6 +79,8 @@ class Pachi():
 
     def get_final_score_matrix(self, sgf_content):
         influence, score = self.get_final_score(sgf_content)
+        if influence is None:
+            return None, None
         influence_matrix = map(float, influence.split()[2:][1::2])
         return influence_matrix, score
 
