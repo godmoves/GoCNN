@@ -59,3 +59,7 @@ class TestBag2d(unittest.TestCase):
 
         self.assertEqual(result1, combo1)
         self.assertEqual(result2, combo2)
+
+
+if __name__ == '__main__':
+    unittest.main()

@@ -20,11 +20,13 @@ def download_extract_file(year, month):
         res = os.system("tar -jxf %s -C %s" % (file_name, dir_name))
         os.remove(file_name)
         assert(res == 0)
+    return res
 
 
 def download_cgos_data(save_path):
+    # move to the save_path first
     os.chdir(save_path)
-    print('save data in %s\n' % os.getcwd())
+    print('save cgos 9x9 data in %s\n' % os.getcwd())
     for y in range(2015, 2019):
         for m in range(1, 13):
             download_extract_file(y, m)

@@ -32,6 +32,7 @@ class GoBoard(object):
         self.boardSize = boardSize
         self.board = {}  # I suppose it can be 'w', 'b' or nothing?
         self.goStrings = {}  # map of pos to gostring
+        self.move_num = 0
 
     def foldStrings(self, targetString, sourceString, joinPos):
         if targetString == sourceString:
@@ -134,9 +135,10 @@ class GoBoard(object):
                     self.addLibertyToAdjacentString(adjstring, enemypos, playColor)
 
     def applyMove(self, playColor, pos):
+        self.move_num += 1
         # seems there is somthing wrong while handle ko
         if pos in self.board:
-            raise ValueError("try to play on exist stone at " + str(pos))
+            raise ValueError("move {} tries to play on exist stone at {}".format(self.move_num, str(pos)))
         # if self.isSimpleKo(playColor, pos):
         #     raise ValueError("try to play on ko move as" + str(pos))
 

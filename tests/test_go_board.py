@@ -97,3 +97,7 @@ class TestGOBoard(unittest.TestCase):
 
         assert (black_own == target_black_own).all()
         assert (white_own == target_white_own).all()
+
+
+if __name__ == '__main__':
+    unittest.main()
