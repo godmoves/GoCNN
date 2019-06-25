@@ -17,10 +17,35 @@ pachi = Pachi(pachi_path="thirdparty/pachi-pachi-12.10-jowa/pachi")
 godriver = GoDriver("data/working/cnn_5layer_64filter", board_size=BOARD_SIZE)
 
 
+def parse_sgf_file(sgf_content):
+    while 'AB' in sgf_content:
+        pos_b = sgf_content.find('AB')
+        sgf_content = to_sequence(sgf_content, pos_b, ';B')
+    while 'AW' in sgf_content:
+        pos_w = sgf_content.find('AW')
+        sgf_content = to_sequence(sgf_content, pos_w, ';W')
+    return sgf_content
+
+
+def to_sequence(sgf_content, pos, prefix):
+    pos += 1
+    start_pos = pos + 1
+    while pos + 4 < len(sgf_content) and sgf_content[pos + 4] == ']':
+        pos += 4
+    end_pos = pos + 1
+    sgf_string = sgf_content[start_pos: end_pos]
+    res = ""
+    for i in range(0, len(sgf_string), 4):
+        res += prefix + sgf_string[i: i + 4]
+    res = sgf_content[: start_pos - 2] + res + sgf_content[end_pos:]
+    return res
+
+
 def board_eval(sgf_content):
     # reset go board
     # skip komi, we will handle this later
     godriver.reset_board()
+    sgf_content = parse_sgf_file(sgf_content)
     try:
         sgf = gomill.sgf.Sgf_game.from_string(sgf_content)
     except ValueError:
